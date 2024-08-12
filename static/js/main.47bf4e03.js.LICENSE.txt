@@ -4,6 +4,12 @@
 	http://jedwatson.github.io/classnames
 */
 
+/*!
+ * github-buttons v2.28.1
+ * (c) 2024 なつき
+ * @license BSD-2-Clause
+ */
+
 /**
  * @license React
  * react-dom.production.min.js
