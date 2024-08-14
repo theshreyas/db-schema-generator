@@ -15,6 +15,7 @@ const FieldRow = ({field, index, handleFieldChange, handleToggleAdvanced, showAd
       </td>
       <td>
         <select
+          aria-label="Field Type"
           className="form-control"
           name="type"
           value={field.type}

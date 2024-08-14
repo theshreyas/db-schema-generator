@@ -19,7 +19,8 @@ const Indices = ({ fields, indices, handleIndexChange, handleRemoveIndex }) => {
                       <br /><br />
                       HASH: Best for quick lookups on columns with unique
                       values, efficient for exact matches.
-                      e.g.customerToken,sessionId
+                      e.g.customerToken,sessionId<br /><br />
+                      Note: Although Magento Docs describes hash, innodb & myisam doesn't support Hash index type <a href="https://github.com/magento/magento2/issues/37327" target="_blank" rel="noopener noreferrer">Link</a>
                     </span>
                   </span>
                 </th>
@@ -34,6 +35,7 @@ const Indices = ({ fields, indices, handleIndexChange, handleRemoveIndex }) => {
                 >
                   <td>
                     <select
+                      aria-label="Select column"
                       className="form-control"
                       name="currentColumn"
                       value={fk.currentColumn}
@@ -51,6 +53,7 @@ const Indices = ({ fields, indices, handleIndexChange, handleRemoveIndex }) => {
                   </td>
                   <td>
                     <select
+                      aria-label="Index Type"
                       className="form-control"
                       name="indexType"
                       value={fk.indexType}

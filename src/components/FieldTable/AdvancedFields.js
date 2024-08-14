@@ -10,7 +10,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
             <div className="row additional">
               {["int", "smallint", "bigint", "float"].includes(field.type) && (
                 <>
-                  <div className="col-md-6">
+                  <div className="col-md-3">
                     <label>Unsigned <span className="infolink">
                         <span className="infotext">UNSIGNED , if specified, disallows negative values</span>
                       </span></label>
@@ -24,7 +24,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                       }
                     />
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-md-3">
                     <label>Identity (Auto Increment)</label>
                     <Form.Check
                       type="switch"
@@ -40,7 +40,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
               )}
               {field.type === "decimal" && (
                 <>
-                  <div className="col-md-6">
+                  <div className="col-md-3">
                     <label>
                       Precision <span className="infolink">
                         <span className="infotext">
@@ -70,7 +70,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                       }
                     />
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-md-3">
                     <label>
                       Scale <span className="infolink">
                         <span className="infotext">
@@ -93,7 +93,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                 </>
               )}
               {["varchar", "char", "varbinary"].includes(field.type) && (
-                <div className="col-md-6">
+                <div className="col-md-3">
                   <label>Length</label>
                   <input
                     type="number"
@@ -108,7 +108,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                   />
                 </div>
               )}
-              <div className="col-md-6">
+              <div className="col-md-3">
                 <label>
                   Not Null (
                   {field.nullable || false
@@ -127,7 +127,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                 />
               </div>
               {!["text", "blob", "json"].includes(field.type) && (
-                <div className="col-md-6">
+                <div className="col-md-3">
                   <label>Primary</label>
                   <Form.Check
                     type="switch"
@@ -142,7 +142,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
               )}
               {["datetime", "timestamp"].includes(field.type) && (
                 <>
-                  <div className="col-md-6">
+                  <div className="col-md-3">
                     <label>On Update <span className="infolink"><span className="infotext">If set to yes, whenever there is update in the row, it will update the column with current timestamp value.</span></span></label>
                     <Form.Check
                       type="switch"
@@ -154,9 +154,10 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                       }
                     />
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-md-3">
                     <label>Default Value</label>
                     <select
+                      aria-label="Default"
                       className="form-control"
                       name="defaultTime"
                       value={field.defaultTime}
@@ -170,7 +171,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                 </>
               )}
               {!["text", "blob", "json"].includes(field.type) && (
-                <div className="col-md-6">
+                <div className="col-md-3">
                   <label>Unique</label>
                   <Form.Check
                     type="switch"
@@ -183,21 +184,21 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                   />
                 </div>
               )}
-              {!["datetime", "timestamp"].includes(field.type) && (
-              <div className="col-md-6">
-                <label>Default Value</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="defaultValue"
-                  value={field.defaultValue || ""}
-                  onChange={(event) =>
-                    handleFieldChange(index, event)
-                  }
-                />
-              </div>
+              {!["datetime", "timestamp", "text", "blob", "json"].includes(field.type) && (
+                <div className="col-md-3">
+                  <label>Default Value</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="defaultValue"
+                    value={field.defaultValue || ""}
+                    onChange={(event) =>
+                      handleFieldChange(index, event)
+                    }
+                  />
+                </div>
               )}
-              <div className="col-md-6">
+              <div className="col-md-3">
                 <label>Comment</label>
                 <input
                   type="text"

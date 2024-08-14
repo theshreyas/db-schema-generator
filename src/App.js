@@ -20,17 +20,26 @@ import {
   removeTableData,
   handleReset,
 } from "./utils/TableActionUtils";
+
 import {
   handleAddField,
   handleRemoveField,
   handleFieldChange,
   handleToggleAdvanced,
 } from "./utils/FieldActionUtils";
+
+import {
+  handleGenerateSQL,
+  handleDownloadSQL,
+  handleCopySQL
+} from "./utils/SqlActionUtils";
+
 import {
   handleGenerateXML,
   handleDownloadXML,
-  handleCopyXML,
+  handleCopyXML
 } from "./utils/XmlActionUtils";
+
 import {
   handleGenerateJSON,
   handleDownloadJSON,
@@ -42,6 +51,7 @@ function App() {
     { name: "", type: "varchar", length: 255, identity: false },
   ]);
   const [xmlOutput, setXmlOutput] = useState("");
+  const [mysqlOutput, setMysqlOutput] = useState("");
   const [tableEngine, setTableEngine] = useState("");
   const [tableResource, setTableResource] = useState("");
   const [jsonOutput, setJsonOutput] = useState("");
@@ -57,6 +67,7 @@ function App() {
   useEffect(() => {
     generateXml();
     generateJson();
+    generateSQL();
   }, [
     fields,
     tableName,
@@ -104,6 +115,17 @@ function App() {
     handleGenerateJSON(fields, indices, tableName, foreignKeys, setJsonOutput);
   };
 
+  const generateSQL = () => {
+    handleGenerateSQL(fields, tableName, foreignKeys, indices, tableComment, tableEngine, setMysqlOutput);
+  };
+
+  const onDownloadSQL = () => {
+    handleDownloadSQL(tableName, mysqlOutput);
+  };
+
+  const onCopySQL = () => {
+    handleCopySQL(mysqlOutput);
+  };
   const onDownloadJSON = () => {
     handleDownloadJSON(jsonOutput);
   };
@@ -175,11 +197,7 @@ function App() {
     );
   };
 
-  const shouldDisplayXmlOutput = () => {
-    return tableName && fields.some((field) => field.name);
-  };
-
-  const shouldDisplayJsonOutput = () => {
+  const shouldDisplayOutput = () => {
     return tableName && fields.some((field) => field.name);
   };
 
@@ -238,12 +256,14 @@ function App() {
       </div>
       <hr />
       <Outputcontainer
-        shouldDisplayXmlOutput={shouldDisplayXmlOutput()}
-        shouldDisplayJsonOutput={shouldDisplayJsonOutput()}
+        shouldDisplayOutput={shouldDisplayOutput()}
         xmlOutput={xmlOutput}
+        mysqlOutput={mysqlOutput}
         jsonOutput={jsonOutput}
         handleDownloadXML={onDownloadXML}
         handleCopyXML={onCopyXML}
+        handleDownloadSQL={onDownloadSQL}
+        handleCopySQL={onCopySQL}
         handleDownloadJSON={onDownloadJSON}
         handleCopyJSON={onCopyJSON}
       />

@@ -1,10 +1,3 @@
-
-//nullable->true/false,default=?,comment=?
-//int/smallint->unsigned->true/false,identity->true/false
-//timestamp ->on_update->true/false, default->CURRENT_TIMESTAMP
-//varchar/char/varbinary ->length->255
-//decimal ->scale->4, precision->12
-//
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';

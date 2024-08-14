@@ -70,6 +70,7 @@ const TableMetaData = ({ tableCommentAdded, tableTwiceClick, tableComment, setTa
                 </td>
                 <td>
                   <select
+                    aria-label="Table Engine"
                     className="form-control"
                     name="tableEngine"
                     value={tableEngine}
@@ -82,6 +83,7 @@ const TableMetaData = ({ tableCommentAdded, tableTwiceClick, tableComment, setTa
                 </td>
                 <td>
                   <select
+                    aria-label="Table Resource"
                     className="form-control"
                     name="tableResource"
                     value={tableResource}

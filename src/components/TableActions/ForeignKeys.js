@@ -36,6 +36,7 @@ const ForeignKeys = ({ foreignKeys, handleForeignKeyChange, fields, handleRemove
               >
                 <td>
                   <select
+                    aria-label="Current Column"
                     className="form-control"
                     name="currentColumn"
                     value={fk.currentColumn}
@@ -71,6 +72,7 @@ const ForeignKeys = ({ foreignKeys, handleForeignKeyChange, fields, handleRemove
                 </td>
                 <td>
                   <select
+                    aria-label="On Delete"
                     className="form-control"
                     name="onDelete"
                     value={fk.onDelete}

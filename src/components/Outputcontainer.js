@@ -1,9 +1,9 @@
 import React from 'react';
 
-const Outputcontainer = ({ shouldDisplayXmlOutput, xmlOutput, handleDownloadXML, handleCopyXML, shouldDisplayJsonOutput, jsonOutput, handleDownloadJSON, handleCopyJSON }) => {
+const Outputcontainer = ({ shouldDisplayOutput, xmlOutput, mysqlOutput, handleDownloadSQL,handleCopySQL,handleDownloadXML, handleCopyXML, jsonOutput, handleDownloadJSON, handleCopyJSON }) => {
   return (
       <div className="output-container">
-        {shouldDisplayXmlOutput && (
+        {shouldDisplayOutput && (
           <div className="output-section">
             <h3>
               <b>db_schema.xml</b>
@@ -20,24 +20,41 @@ const Outputcontainer = ({ shouldDisplayXmlOutput, xmlOutput, handleDownloadXML,
             </button>
           </div>
         )}
+        <div className="output-sub-container">
+          {shouldDisplayOutput && (
+            <div className="output-section">
+              <h3>
+                <b>db_schema_whitelist.json</b>
+              </h3>
+              <pre>{jsonOutput}</pre>
+              <button
+                className="btn btn-secondary mr-2"
+                onClick={handleDownloadJSON}
+              >
+                Download
+              </button>
+              <button className="btn btn-secondary" onClick={handleCopyJSON}>
+                Copy JSON
+              </button>
+            </div>
+          )}
 
-        {shouldDisplayJsonOutput && (
-          <div className="output-section">
-            <h3>
-              <b>db_schema_whitelist.json</b>
-            </h3>
-            <pre>{jsonOutput}</pre>
-            <button
-              className="btn btn-secondary mr-2"
-              onClick={handleDownloadJSON}
-            >
-              Download
-            </button>
-            <button className="btn btn-secondary" onClick={handleCopyJSON}>
-              Copy JSON
-            </button>
-          </div>
-        )}
+          {shouldDisplayOutput && (
+            <div className="output-section">
+              <h3>
+                <b>MySQL Query</b>
+              </h3>
+              <pre>{mysqlOutput}</pre>
+              <button
+                className="btn btn-secondary mr-2"
+                onClick={handleDownloadSQL}
+              >Download</button>
+              <button className="btn btn-secondary" onClick={handleCopySQL}>
+                Copy Query
+              </button>
+            </div>
+          )}
+        </div>
       </div>
   );
 };
