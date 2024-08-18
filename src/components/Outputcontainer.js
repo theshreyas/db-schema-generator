@@ -1,9 +1,9 @@
 import React from 'react';
 
-const Outputcontainer = ({ shouldDisplayOutput, xmlOutput, mysqlOutput, handleDownloadSQL,handleCopySQL,handleDownloadXML, handleCopyXML, jsonOutput, handleDownloadJSON, handleCopyJSON }) => {
+const Outputcontainer = ({ shouldDisplaySchemaOutput, shouldDisplaySqlOutput, xmlOutput, mysqlOutput, handleDownloadSQL, handleCopySQL,handleDownloadXML, handleCopyXML, jsonOutput, handleDownloadJSON, handleCopyJSON }) => {
   return (
       <div className="output-container">
-        {shouldDisplayOutput && (
+        {shouldDisplaySchemaOutput && (
           <div className="output-section">
             <h3>
               <b>db_schema.xml</b>
@@ -21,7 +21,7 @@ const Outputcontainer = ({ shouldDisplayOutput, xmlOutput, mysqlOutput, handleDo
           </div>
         )}
         <div className="output-sub-container">
-          {shouldDisplayOutput && (
+          {shouldDisplaySchemaOutput && (
             <div className="output-section">
               <h3>
                 <b>db_schema_whitelist.json</b>
@@ -39,7 +39,7 @@ const Outputcontainer = ({ shouldDisplayOutput, xmlOutput, mysqlOutput, handleDo
             </div>
           )}
 
-          {shouldDisplayOutput && (
+          {shouldDisplaySqlOutput && (
             <div className="output-section">
               <h3>
                 <b>MySQL Query</b>

@@ -2,13 +2,9 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Header from "./components/Header.js";
-import Tablename from "./components/FieldTable/Tablename.js";
-import FieldTableData from "./components/FieldTable/FieldTableData.js";
+import Inputcontainer from "./components/Inputcontainer.js";
 import Outputcontainer from "./components/Outputcontainer.js";
-import TableMetaData from "./components/TableActions/TableMetaData.js";
-import ActionButtons from "./components/TableActions/ActionButtons.js";
-import ForeignKeys from "./components/TableActions/ForeignKeys.js";
-import Indices from "./components/TableActions/Indices.js";
+import QueryBuilder from "./components/QueryBuilder.js";
 import {
   handleAddIndex,
   handleIndexChange,
@@ -20,6 +16,10 @@ import {
   removeTableData,
   handleReset,
 } from "./utils/TableActionUtils";
+
+import {
+  queryToSchema
+} from "./utils/QueryToSchemaActionUtils";
 
 import {
   handleAddField,
@@ -51,6 +51,9 @@ function App() {
     { name: "", type: "varchar", length: 255, identity: false },
   ]);
   const [xmlOutput, setXmlOutput] = useState("");
+  const [mysqlQuery, setMysqlQuery] = useState("");
+  const [queryError, setQueryError] = useState(false);
+  const [queryBuilder, setQueryBuilder] = useState(false);
   const [mysqlOutput, setMysqlOutput] = useState("");
   const [tableEngine, setTableEngine] = useState("");
   const [tableResource, setTableResource] = useState("");
@@ -77,7 +80,20 @@ function App() {
     tableComment,
     tableResource,
     tableEngine,
+    mysqlQuery,
+    queryBuilder
   ]);
+
+  useEffect(() => {
+    queryToSchemaXml();
+  }, [
+    mysqlQuery,
+    tableName
+  ]);
+
+  const queryToSchemaXml = () => {
+    queryBuilder && queryToSchema(mysqlQuery, setTableName, setIndices, setForeignKeys,setTableEngine, setTableComment, setFields, setXmlOutput, setQueryError);
+  };
 
   const onForeignKeyAdd = () => {
     handleAddForeignKey(foreignKeys, setForeignKeys, indices, setIndices);
@@ -116,7 +132,7 @@ function App() {
   };
 
   const generateSQL = () => {
-    handleGenerateSQL(fields, tableName, foreignKeys, indices, tableComment, tableEngine, setMysqlOutput);
+    !queryBuilder && handleGenerateSQL(fields, tableName, foreignKeys, indices, tableComment, tableEngine, setMysqlOutput);
   };
 
   const onDownloadSQL = () => {
@@ -197,66 +213,75 @@ function App() {
     );
   };
 
-  const shouldDisplayOutput = () => {
-    return tableName && fields.some((field) => field.name);
+  const shouldDisplaySchemaOutput = () =>
+    tableName && fields.some(field => field.name) &&
+    (!queryBuilder || (queryBuilder && mysqlQuery && !queryError));
+
+  const shouldDisplaySqlOutput = () => {
+    return shouldDisplaySchemaOutput() && !queryBuilder;
   };
 
   return (
     <div className="container mt-5">
-      <Header />
-      <div className="input-container">
-        <Tablename
-          tableName={tableName}
-          setTableName={setTableName}
-          handleReset={resetAll}
-        />
-
-        <FieldTableData
-          fields={fields}
-          handleFieldChange={onFieldChange}
-          handleToggleAdvanced={onToggleAdvanced}
-          showAdvanced={showAdvanced}
-          handleAddField={onAddField}
-          handleRemoveField={onRemoveField}
-        />
-
-        <ActionButtons
-          handleAddForeignKey={onForeignKeyAdd}
-          handleAddIndex={onIndexAdd}
-          handleTableData={onAddTableData}
-        />
-
-        <TableMetaData
-          tableCommentAdded={tableCommentAdded}
-          tableTwiceClick={tableTwiceClick}
-          tableComment={tableComment}
-          setTableComment={setTableComment}
-          tableEngine={tableEngine}
-          setTableEngine={setTableEngine}
-          tableResource={tableResource}
-          setTableResource={setTableResource}
-          migrateTable={migrateTable}
-          setMigrateTable={setMigrateTable}
-          removeTableData={onRemoveTableData}
-        />
-
-        <Indices
-          fields={fields}
-          indices={indices}
-          handleIndexChange={onIndexChange}
-          handleRemoveIndex={onIndexRemove}
-        />
-
-        <ForeignKeys
+      <Header queryBuilder={queryBuilder} setQueryBuilder={setQueryBuilder} />
+      {!queryBuilder && (
+        <Inputcontainer 
           fields={fields}
           foreignKeys={foreignKeys}
+          handleAddField={onAddField}
+          handleAddForeignKey={onForeignKeyAdd}
+          handleAddIndex={onIndexAdd}
+          handleFieldChange={onFieldChange}
           handleForeignKeyChange={onForeignKeyChange}
+          handleIndexChange={onIndexChange}
+          handleRemoveField={onRemoveField}
           handleRemoveForeignKey={onRemoveForeignKey}
+          handleRemoveIndex={onIndexRemove}
+          handleReset={resetAll}
+          handleTableData={onAddTableData}
+          handleToggleAdvanced={onToggleAdvanced}
+          indices={indices}
+          migrateTable={migrateTable}
+          onAddField={onAddField}
+          onAddTableData={onAddTableData}
+          onFieldChange={onFieldChange}
+          onForeignKeyAdd={onForeignKeyAdd}
+          onForeignKeyChange={onForeignKeyChange}
+          onIndexAdd={onIndexAdd}
+          onIndexChange={onIndexChange}
+          onIndexRemove={onIndexRemove}
+          onRemoveField={onRemoveField}
+          onRemoveForeignKey={onRemoveForeignKey}
+          onRemoveTableData={onRemoveTableData}
+          onToggleAdvanced={onToggleAdvanced}
+          removeTableData={onRemoveTableData}
+          resetAll={resetAll}
+          setMigrateTable={setMigrateTable}
+          setTableComment={setTableComment}
+          setTableEngine={setTableEngine}
+          setTableName={setTableName}
+          setTableResource={setTableResource}
+          showAdvanced={showAdvanced}
+          tableComment={tableComment}
+          tableCommentAdded={tableCommentAdded}
+          tableEngine={tableEngine}
+          tableName={tableName}
+          tableResource={tableResource}
+          tableTwiceClick={tableTwiceClick}
         />
-      </div>
+      )}
+      {queryBuilder && (
+        <QueryBuilder
+          queryBuilder={queryBuilder}
+          mysqlQuery={mysqlQuery}
+          setMysqlQuery={setMysqlQuery}
+          queryError={queryError}
+        />
+      )}
       <hr />
       <Outputcontainer
-        shouldDisplayOutput={shouldDisplayOutput()}
+        shouldDisplaySchemaOutput={shouldDisplaySchemaOutput()}
+        shouldDisplaySqlOutput={shouldDisplaySqlOutput()}
         xmlOutput={xmlOutput}
         mysqlOutput={mysqlOutput}
         jsonOutput={jsonOutput}

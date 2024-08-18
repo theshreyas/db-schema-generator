@@ -56,15 +56,22 @@ export const handleFieldChange = (index, event, fields, setFields) => {
     ...newFields[index],
     [name]: type === "checkbox" ? checked : value,
   };
+  const field = newFields[index];
 
-  if (name === "primary" && checked) {
-    newFields[index].nullable = true;
+  // Check for datetime or timestamp type and update on_update
+  if (["datetime", "timestamp"].includes(field.type)) {
+      field.on_update = !!field.on_update;
   }
-  if (name === "identity" && checked) {
-    if (newFields.filter((field) => field.identity).length > 1) {
+
+  // Update nullable if field is primary
+  if (name === "primary" && checked) {
+      field.nullable = true;
+  }
+
+  // Check for identity and uniqueness
+  if (name === "identity" && checked && newFields.filter(field => field.identity).length > 1) {
       alert("There can only be one auto-increment (identity) column.");
       return;
-    }
   }
   setFields(newFields);
 };

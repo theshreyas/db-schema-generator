@@ -189,7 +189,7 @@ table.table.migrate {
   text-align: center;
   width: 2ex;
   height: 2ex;
-  font-size: 1.9ex;
+  font-size: 2.0ex;
   line-height: 1.5ex;
   border-radius: 1.5ex;
   margin-right: 6px;
@@ -241,4 +241,47 @@ table.table.migrate {
     padding: 3px;
     font-size: small;
   }
+  .querybuilder {
+    display: inherit !important;
+  }
+  .builderToggle {
+    margin-top: 0 !important;
+    margin-bottom: 2%;
+  }
+  .querybuilder textarea {
+    width: 100% !important;
+  }
+}
+.querybuilder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 1%;
+}
+
+.querybuilder textarea {
+  padding: 10px;
+  width: 70%;
+  margin-bottom: 1%;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.builderToggle {
+  margin-top: 15px;
+  float: right;  
+}
+.validation {
+  font-size: 16px;
+  color: red;
+  margin-top: 1%;
+}
+.validation span{
+  color: black;
+}
+textarea.error,
+textarea.error:focus,
+textarea.error:focus-visible {
+  border: solid 2px red;
 }
