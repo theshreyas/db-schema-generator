@@ -184,7 +184,7 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                   />
                 </div>
               )}
-              {!["datetime", "timestamp", "text", "blob", "json"].includes(field.type) && (
+              {!["datetime", "timestamp", "text", "blob", "json"].includes(field.type) && !field.identity && (
                 <div className="col-md-3">
                   <label>Default Value</label>
                   <input

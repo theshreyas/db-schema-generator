@@ -40,11 +40,10 @@ export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKe
   ];
 
   const uniqueKeys = colDefs.filter(col => col.constraint_type?.toLowerCase() === 'unique key').flatMap(item => item.definition.map(def => def.column));
-
   const indices = colDefs.filter(col => col.index)
     .flatMap(item => item.definition.map(def => ({
       currentColumn: def.column,
-      indexType: "btree"
+      indexType: item.keyword && item.keyword.toLowerCase().includes("fulltext") ? "fulltext" : "btree"
   })))
   .filter((value, index, self) =>
     index === self.findIndex((t) => t.currentColumn === value.currentColumn)

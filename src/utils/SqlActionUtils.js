@@ -7,11 +7,13 @@ export const handleGenerateSQL = (
   tableEngine,
   setMysqlOutput
 ) => {
+  const uniqueFields = fields.filter((field) => field.unique);
+  const primaryKeys = fields.filter((field) => field.primary);
   const createTableQuery = [
-    `CREATE TABLE \`${tableName}\` (\n`,
-    fields
-      .filter((field) => field.name)
-      .map((field) => {
+  `CREATE TABLE \`${tableName}\` (\n`,
+  fields
+    .filter((field) => field.name)
+    .map((field) => {
         const parts = [
           `\`${field.name}\` ${field.type.toUpperCase()}`,
           ["varchar", "char"].includes(field.type) && field.length
@@ -22,31 +24,34 @@ export const handleGenerateSQL = (
             : "",
           field.unsigned && ["int", "smallint", "bigint", "float"].includes(field.type) && `UNSIGNED`,
           field.nullable ? "NOT NULL" : "NULL",
-          field.defaultValue ? `DEFAULT '${field.defaultValue}'` : "",
+          !field.identity && field.defaultValue ? `DEFAULT '${field.defaultValue}'` : "",
           ["datetime", "timestamp"].includes(field.type) && field.defaultTime ? `DEFAULT ${field.defaultTime}` : "",
           field.identity && ["int", "smallint", "bigint", "float"].includes(field.type) && "AUTO_INCREMENT",
-          field.primary && !["text", "blob", "json"].includes(field.type) && "PRIMARY KEY",
           ["datetime", "timestamp"].includes(field.type) && field.on_update && "ON UPDATE CURRENT_TIMESTAMP",
         ].filter(Boolean);
-        return `  ${parts.join(" ")}`;
-      })
-      .join(",\n"),
-    indices
-      .filter((index) => index.currentColumn && index.indexType)
-      .map((index) => {
-        const referenceId = `${tableName}_${index.currentColumn}`.toUpperCase();
-        return `\n,${index.indexType === 'fulltext' ? " FULLTEXT" : ""} INDEX \`${referenceId}\` ${index.indexType === 'hash' ? "USING HASH " : ""}(\`${index.currentColumn}\`)`;
-      })
-      .join("\n"),
-    foreignKeys
-      .filter(
-        (key) => key.currentColumn && key.referenceTable && key.referenceColumn
-      )
-      .map((fk) =>
-        `\n, FOREIGN KEY (\`${fk.currentColumn}\`) REFERENCES \`${fk.referenceTable}\`(\`${fk.referenceColumn}\`) ON DELETE ${fk.onDelete.toUpperCase()}`
-      )
-      .join("\n"),
-    `\n) ENGINE=${tableEngine ? tableEngine.toLowerCase() : "innodb"}`,
+      return `  ${parts.join(" ")}`;
+    })
+    .join(",\n"),
+  primaryKeys.length > 0 ? `,\n  PRIMARY KEY (${primaryKeys.map((field) => `\`${field.name}\``).join(",")})` : "",
+  uniqueFields
+    .map((field) =>
+      `,\n  UNIQUE KEY \`${tableName.toUpperCase()}_${field.name.toUpperCase()}\` (\`${field.name}\`)`
+    )
+    .join(""),
+  indices
+    .filter((index) => index.currentColumn && index.indexType)
+    .map((index) => {
+      const referenceId = `${tableName}_${index.currentColumn}`.toUpperCase();
+      return `,\n${index.indexType === 'fulltext' ? "  FULLTEXT" : ""}  INDEX \`${referenceId}\` ${index.indexType === 'hash' ? "USING HASH " : ""}(\`${index.currentColumn}\`)`;
+    })
+    .join(""),
+  foreignKeys
+    .filter((fk) => fk.currentColumn && fk.referenceTable && fk.referenceColumn)
+    .map((fk) =>
+      `,\n  FOREIGN KEY (\`${fk.currentColumn}\`) REFERENCES \`${fk.referenceTable}\`(\`${fk.referenceColumn}\`) ON DELETE ${fk.onDelete.toUpperCase()}`
+    )
+    .join(""),
+  `\n) ENGINE=${tableEngine ? tableEngine.toLowerCase() : "innodb"}`,
     tableComment ? ` COMMENT='${tableComment}'` : "",
     ";",
   ].join("");

@@ -22,7 +22,7 @@ export const handleGenerateXML = (
         : field.nullable
         ? `nullable="false"`
         : "",
-      field.defaultValue && `default="${field.defaultValue}"`,
+      !field.identity && field.defaultValue && `default="${field.defaultValue}"`,
       ["datetime", "timestamp"].includes(field.type) && field.defaultTime && `default="${field.defaultTime}"`,
       ["datetime", "timestamp"].includes(field.type)
         ? `on_update="${field.on_update}"`

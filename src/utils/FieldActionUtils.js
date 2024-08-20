@@ -31,7 +31,7 @@ export const handleRemoveField = (
   }
 };
 
-export const handleFieldChange = (index, event, fields, setFields) => {
+export const handleFieldChange = (index, event, fields, setFields, foreignKeys) => {
   const { name, type, value, checked } = event.target;
   const newFields = [...fields];
   if (
@@ -58,20 +58,24 @@ export const handleFieldChange = (index, event, fields, setFields) => {
   };
   const field = newFields[index];
 
-  // Check for datetime or timestamp type and update on_update
   if (["datetime", "timestamp"].includes(field.type)) {
       field.on_update = !!field.on_update;
   }
-
-  // Update nullable if field is primary
+  if (name === "nullable") {
+    if(field.primary && !checked && !["text", "blob", "json"].includes(field.type)) {
+      return alert('Primary field cannot be set null');
+    }
+    const nullableKeyExist = foreignKeys.find(key => key.currentColumn === field.name && key.onDelete === "SET NULL");
+    if (nullableKeyExist && checked) {
+      return alert('Foreign key is added with on delete not null value!');
+    }
+  }
   if (name === "primary" && checked) {
       field.nullable = true;
   }
 
-  // Check for identity and uniqueness
   if (name === "identity" && checked && newFields.filter(field => field.identity).length > 1) {
-      alert("There can only be one auto-increment (identity) column.");
-      return;
+      return alert("There can only be one auto-increment (identity) column.");
   }
   setFields(newFields);
 };

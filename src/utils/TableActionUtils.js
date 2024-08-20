@@ -86,7 +86,8 @@ export const handleForeignKeyChange = (
   index,
   event,
   foreignKeys,
-  setForeignKeys
+  setForeignKeys,
+  fields
 ) => {
   const { name, value } = event.target;
   const newForeignKeys = [...foreignKeys];
@@ -94,6 +95,9 @@ export const handleForeignKeyChange = (
     ...newForeignKeys[index],
     [name]: value,
   };
+  if(value === 'SET NULL' && fields.some((field) => newForeignKeys[index].currentColumn === field.name && field.nullable)){
+    return alert('Not nullable field cannot be SET NULL!');
+  }
   setForeignKeys(newForeignKeys);
 };
 

@@ -112,7 +112,7 @@ function App() {
   };
 
   const onFieldChange = (index, event) => {
-    handleFieldChange(index, event, fields, setFields);
+    handleFieldChange(index, event, fields, setFields, foreignKeys);
   };
 
   const onToggleAdvanced = (index) => {
@@ -192,7 +192,7 @@ function App() {
   };
 
   const onForeignKeyChange = (index, event) => {
-    handleForeignKeyChange(index, event, foreignKeys, setForeignKeys);
+    handleForeignKeyChange(index, event, foreignKeys, setForeignKeys, fields);
   };
 
   const onRemoveForeignKey = (index) => {
