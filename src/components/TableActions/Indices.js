@@ -55,7 +55,7 @@ const Indices = ({ fields, indices, handleIndexChange, handleRemoveIndex }) => {
                       classNamePrefix="select"
                       onChange={(selectedOptions) => {
                         const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
-                        handleIndexChange(index, selectedValues);
+                        handleIndexChange(index, selectedValues, fields);
                       }}
                     />
                   </td>

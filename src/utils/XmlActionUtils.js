@@ -52,10 +52,7 @@ export const handleGenerateXML = (
   };
 
   const generateIndexXML = (index) => {
-    console.log('generateIndexXML');
-    console.log(index);
     const referenceId = index.index || `${tableName}_${index.columnsToIndex.join('_')}`.toUpperCase();
-    console.log('generateIndexXML2');
     const columnsXML = index.columnsToIndex
       .map((col) => `\t\t\t<column name="${col}"/>`)
       .join("\n");
@@ -63,10 +60,15 @@ export const handleGenerateXML = (
   };
 
   const xmlFields = fields.filter(field => field.name).map(generateFieldXML).join("\n");
+
   const primaryFields = fields.filter(field => field.primary && !["text", "blob", "json"].includes(field.type));
+
   const primaryConstraint = primaryFields.length ? generateConstraintXML("primary", `PRIMARY`, primaryFields.map(f => f.name)) : "";
-  const uniqueConstraint = uniqueKeys.length ? uniqueKeys.filter(key => key?.uniqueColumns?.length).map(uk => generateConstraintXML("unique", uk.index || `${tableName.toUpperCase()}_${uk.uniqueColumns.join('_').toUpperCase()}`, uk.uniqueColumns)).join("") : "";
+
+  const uniqueConstraint = uniqueKeys.filter(key => key?.uniqueColumns?.length).map(uk => generateConstraintXML("unique", uk.index || `${tableName.toUpperCase()}_${uk.uniqueColumns.join('_').toUpperCase()}`, uk.uniqueColumns)).join("");
+
   const foreignKeyConstraints = foreignKeys.filter(fk => fk.currentColumn && fk.referenceTable && fk.referenceColumn).map(generateForeignKeyXML).join("");
+
   const indexNodes = indices.filter(index => index.columnsToIndex?.length && index.indexType).map(generateIndexXML).join("");
 
   const tableAttributes = createAttributesString([

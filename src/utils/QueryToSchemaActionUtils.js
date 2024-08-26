@@ -42,10 +42,8 @@ export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKe
       uniqueColumns: item.definition.map(i => i.column),
       index: item.index
     }));
-  console.log(colDefs);
-  console.log('1uniqueKeys');
-  console.log(uniqueKeys);
   setUniqueKeys(uniqueKeys);
+  
   const indices = colDefs
     .filter(col => col.resource === 'index')
     .map(item => ({
@@ -63,7 +61,6 @@ export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKe
     referenceColumn: col.reference_definition?.definition[0]?.column,
     onDelete: col.reference_definition?.on_action[0]?.value?.value?.toUpperCase()
   }));
-
   setForeignKeys(foreignKeys);
 
   const fields = colDefs.filter(col => col.column).map(col => ({
@@ -78,6 +75,5 @@ export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKe
     on_update: col.default_val?.value?.over?.type === "on update" || false,
     comment: col.comment?.value?.value || null
   }));
-  console.log(fields);
   setFields(fields);
 };

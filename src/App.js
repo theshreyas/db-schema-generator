@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Header from "./components/Header";
@@ -197,7 +197,7 @@ function App() {
   };
 
   const onIndexChange = (index, selectedValue) => {
-    handleIndexChange(index, selectedValue, indices, setIndices);
+    handleIndexChange(index, selectedValue, indices, setIndices, fields);
   };
 
   const onIndexRemove = (index) => {
@@ -244,7 +244,7 @@ function App() {
   };
 
   return (
-    <Router basename="/db-schema-generator">
+    <Router>
       <Routes>
         <Route path="/about" element={<About />} />
         <Route path="/datatypes" element={<DataTypes />} />

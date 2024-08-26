@@ -1,154 +1,119 @@
 const setInvalidRow = (index, setState, state) => {
-  const newState = [...state];
-  newState[index].isInvalid = true;
-  setState(newState);
+  const updateState = (isInvalid) => {
+    const newState = [...state];
+    newState[index].isInvalid = isInvalid;
+    setState(newState);
+  };
 
-  setTimeout(() => {
-    const updatedState = [...state];
-    updatedState[index].isInvalid = false;
-    setState(updatedState);
-  }, 1000);
+  updateState(true);
+  setTimeout(() => updateState(false), 1000);
 };
 
-export const handleRemoveIndex = (index, indices, setIndices) => {
-  const newIndices = [...indices];
-  newIndices.splice(index, 1);
-  setIndices(newIndices);
+const handleAddKey = (keys, setKeys, keyTemplate, invalidCondition) => {
+  const invalidKeys = keys
+    .map((key, idx) => ({ key, idx }))
+    .filter(({ key }) => invalidCondition(key));
+
+  if (invalidKeys.length === 0) {
+    setKeys([...keys, keyTemplate]);
+  } else {
+    invalidKeys.forEach(({ idx }) => setInvalidRow(idx, setKeys, keys));
+  }
 };
 
 export const handleAddForeignKey = (foreignKeys, setForeignKeys) => {
-  const invalidKeys = foreignKeys
-    .map((key, idx) => ({ key, idx }))
-    .filter(
-      ({ key }) =>
-        !key.currentColumn || !key.referenceTable || !key.referenceColumn
-    );
-
-  if (invalidKeys.length === 0) {
-    const newForeignKey = {
+  handleAddKey(
+    foreignKeys,
+    setForeignKeys,
+    {
       currentColumn: "",
       referenceTable: "",
       referenceColumn: "",
       onDelete: "CASCADE",
-    };
-    setForeignKeys([...foreignKeys, newForeignKey]);
-  } else {
-    invalidKeys.forEach(({ idx }) => {
-      setInvalidRow(idx, setForeignKeys, foreignKeys);
-    });
-  }
+    },
+    (key) => !key.currentColumn || !key.referenceTable || !key.referenceColumn
+  );
 };
 
 export const handleAddUniqueKey = (uniqueKeys, setUniqueKeys) => {
-  const invalidKeys = uniqueKeys
-    .map((key, idx) => ({ key, idx }))
-    .filter(
-      ({ key }) =>
-        !key.uniqueColumns 
-    );
-  if (invalidKeys.length === 0) {
-    const newUniqueKey = {
-      uniqueColumns: "",
-    };
-    setUniqueKeys([...uniqueKeys, newUniqueKey]);
-  } else {
-    invalidKeys.forEach(({ idx }) => {
-      setInvalidRow(idx, setUniqueKeys, uniqueKeys);
-    });
-  }
+  handleAddKey(
+    uniqueKeys,
+    setUniqueKeys,
+    { uniqueColumns: "" },
+    (key) => !key.uniqueColumns
+  );
 };
 
 export const handleAddIndex = (indices, setIndices) => {
-  const invalidIndices = indices
-    .map((index, idx) => ({ index, idx }))
-    .filter(({ index }) => !index.columnsToIndex);
-  if (invalidIndices.length === 0) {
-    const newIndex = {
-      columnsToIndex: "",
-      indexType: "btree",
-    };
-    setIndices([...indices, newIndex]);
-  } else {
-    invalidIndices.forEach(({ idx }) => {
-      setInvalidRow(idx, setIndices, indices);
-    });
-  }
+  handleAddKey(
+    indices,
+    setIndices,
+    { columnsToIndex: "", indexType: "btree" },
+    (index) => !index.columnsToIndex
+  );
 };
 
-export const handleIndexChange = (index, selectedValue, indices, setIndices) => {
+export const handleIndexChange = (index, selectedValue, indices, setIndices, fields) => {
   const newIndices = [...indices];
   const name = Array.isArray(selectedValue) ? 'columnsToIndex' : 'indexType';
+
+  if (Array.isArray(selectedValue) && selectedValue.some(value => {
+    const field = fields.find(f => f.name === value);
+    return field && ["text", "blob", "json"].includes(field.type);
+  })) {
+    return alert('Cannot index Text/Blob/Json fields!');
+  }
+
   newIndices[index][name] = selectedValue;
   setIndices(newIndices);
 };
 
-export const handleUniqueKeyChange = (
-  index,
-  selectedValues,
-  uniqueKeys,
-  setUniqueKeys
-) => {
+export const handleUniqueKeyChange = (index, selectedValues, uniqueKeys, setUniqueKeys) => {
   const newUniqueKeys = [...uniqueKeys];
-  newUniqueKeys[index] = {
-    ...newUniqueKeys[index],
-    uniqueColumns: selectedValues,
-  };
+  newUniqueKeys[index].uniqueColumns = selectedValues;
   setUniqueKeys(newUniqueKeys);
 };
 
-export const handleForeignKeyChange = (
-  index,
-  event,
-  foreignKeys,
-  setForeignKeys,
-  fields
-) => {
+export const handleForeignKeyChange = (index, event, foreignKeys, setForeignKeys, fields) => {
   const { name, value } = event.target;
   const newForeignKeys = [...foreignKeys];
-  newForeignKeys[index] = {
-    ...newForeignKeys[index],
-    [name]: value,
-  };
-  if(value === 'SET NULL' && fields.some((field) => newForeignKeys[index].currentColumn === field.name && field.nullable)){
+  newForeignKeys[index][name] = value;
+
+  if (value === 'SET NULL' && fields.some(field => newForeignKeys[index].currentColumn === field.name && !field.nullable)) {
     return alert('Not nullable field cannot be SET NULL!');
   }
+
   setForeignKeys(newForeignKeys);
+};
+
+const handleRemoveItem = (index, items, setItems) => {
+  const newItems = [...items];
+  newItems.splice(index, 1);
+  setItems(newItems);
 };
 
 export const handleRemoveForeignKey = (index, foreignKeys, setForeignKeys) => {
-  const newForeignKeys = [...foreignKeys];
-  newForeignKeys.splice(index, 1);
-  setForeignKeys(newForeignKeys);
+  handleRemoveItem(index, foreignKeys, setForeignKeys);
 };
 
 export const handleRemoveUniqueKey = (index, uniqueKeys, setUniqueKeys) => {
-  const newUniqueKeys = [...uniqueKeys];
-  newUniqueKeys.splice(index, 1);
-  setUniqueKeys(newUniqueKeys);
+  handleRemoveItem(index, uniqueKeys, setUniqueKeys);
 };
 
-export const handleTableData = (
-  tableCommentAdded,
-  setTableTwiceClick,
-  setTableCommentAdded
-) => {
+export const handleRemoveIndex = (index, indices, setIndices) => {
+  handleRemoveItem(index, indices, setIndices);
+};
+
+export const handleTableData = (tableCommentAdded, setTableTwiceClick, setTableCommentAdded) => {
   if (tableCommentAdded) {
     setTableTwiceClick(true);
-    setTimeout(() => {
-      setTableTwiceClick(false);
-    }, 1000);
+    setTimeout(() => setTableTwiceClick(false), 1000);
   } else {
     setTableCommentAdded(true);
   }
 };
 
-export const removeTableData = (
-  setTableCommentAdded,
-  setTableEngine,
-  setMigrateTable,
-  setTableComment,
-  setTableResource
-) => {
+export const removeTableData = (setTableCommentAdded, setTableEngine, setMigrateTable, setTableComment, setTableResource) => {
   setTableCommentAdded(false);
   setTableEngine("");
   setMigrateTable("");
@@ -156,19 +121,7 @@ export const removeTableData = (
   setTableResource("");
 };
 
-export const handleReset = (
-  setTableName,
-  setTableCommentAdded,
-  setMigrateTable,
-  setTableEngine,
-  setTableComment,
-  setTableResource,
-  setFields,
-  setShowAdvanced,
-  setForeignKeys,
-  setUniqueKeys,
-  setIndices
-) => {
+export const handleReset = (setTableName, setTableCommentAdded, setMigrateTable, setTableEngine, setTableComment, setTableResource, setFields, setShowAdvanced, setForeignKeys, setUniqueKeys, setIndices) => {
   setTableName("");
   setTableCommentAdded(false);
   setMigrateTable("");
