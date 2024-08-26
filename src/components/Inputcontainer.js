@@ -4,9 +4,10 @@ import FieldTableData from "./FieldTable/FieldTableData.js";
 import ActionButtons from "./TableActions/ActionButtons.js";
 import TableMetaData from "./TableActions/TableMetaData.js";
 import ForeignKeys from "./TableActions/ForeignKeys.js";
+import UniqueKeys from "./TableActions/UniqueKeys.js";
 import Indices from "./TableActions/Indices.js";
 
-const Inputcontainer = ({ fields, foreignKeys, handleAddField, handleAddForeignKey, handleAddIndex, handleFieldChange, handleForeignKeyChange, handleIndexChange, handleRemoveField, handleRemoveForeignKey, handleRemoveIndex, handleReset, handleTableData, handleToggleAdvanced, indices, migrateTable, onFieldChange, onToggleAdvanced, onAddField, onRemoveField,onForeignKeyAdd,onRemoveTableData, onIndexAdd, onAddTableData, onIndexChange, onIndexRemove, onForeignKeyChange,onRemoveForeignKey, removeTableData, resetAll, setMigrateTable, setTableComment, setTableEngine, setTableName, setTableResource, showAdvanced, tableComment, tableCommentAdded, tableEngine,tableName, tableResource, tableTwiceClick }) => {
+const Inputcontainer = ({ fields, foreignKeys, uniqueKeys, handleAddField, handleAddForeignKey,handleAddUniqueKey, handleAddIndex, handleFieldChange, handleForeignKeyChange, handleUniqueKeyChange, handleIndexChange, handleRemoveField, handleRemoveForeignKey, handleRemoveUniqueKey, handleRemoveIndex, handleReset, handleTableData, handleToggleAdvanced, indices, migrateTable, onFieldChange, onToggleAdvanced, onAddField, onRemoveField, onForeignKeyAdd, onUniqueKeyAdd, onRemoveTableData, onIndexAdd, onAddTableData, onIndexChange, onIndexRemove, onForeignKeyChange, onUniqueKeyChange, onRemoveForeignKey, onRemoveUniqueKey, removeTableData, resetAll, setMigrateTable, setTableComment, setTableEngine, setTableName, setTableResource, showAdvanced, tableComment, tableCommentAdded, tableEngine,tableName, tableResource, tableTwiceClick }) => {
   return (
     <div className="input-container">
         <Tablename
@@ -26,6 +27,7 @@ const Inputcontainer = ({ fields, foreignKeys, handleAddField, handleAddForeignK
 
         <ActionButtons
           handleAddForeignKey={onForeignKeyAdd}
+          handleAddUniqueKey={onUniqueKeyAdd}
           handleAddIndex={onIndexAdd}
           handleTableData={onAddTableData}
         />
@@ -56,6 +58,13 @@ const Inputcontainer = ({ fields, foreignKeys, handleAddField, handleAddForeignK
           foreignKeys={foreignKeys}
           handleForeignKeyChange={onForeignKeyChange}
           handleRemoveForeignKey={onRemoveForeignKey}
+        />
+
+        <UniqueKeys
+          fields={fields}
+          uniqueKeys={uniqueKeys}
+          handleUniqueKeyChange={onUniqueKeyChange}
+          handleRemoveUniqueKey={onRemoveUniqueKey}
         />
       </div>
   );

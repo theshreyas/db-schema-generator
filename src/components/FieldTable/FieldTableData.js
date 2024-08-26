@@ -8,7 +8,12 @@ const FieldTableData = ({fields, handleFieldChange, handleToggleAdvanced, showAd
       <thead>
         <tr>
           <th>Field Name</th>
-          <th>Input Type</th>
+          <th>Input Type <span className="infolink">
+              <span className="infotext">
+                Check all available datatypes <a href="/db-schema-generator/datatypes" target="_blank" rel="noopener noreferrer">here</a>
+              </span>
+            </span>
+          </th>
           <th>Actions</th>
         </tr>
       </thead>

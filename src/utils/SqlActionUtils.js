@@ -2,12 +2,12 @@ export const handleGenerateSQL = (
   fields,
   tableName,
   foreignKeys,
+  uniqueKeys,
   indices,
   tableComment,
   tableEngine,
   setMysqlOutput
 ) => {
-  const uniqueFields = fields.filter((field) => field.unique);
   const primaryKeys = fields.filter((field) => field.primary);
   const createTableQuery = [
   `CREATE TABLE \`${tableName}\` (\n`,
@@ -33,16 +33,13 @@ export const handleGenerateSQL = (
     })
     .join(",\n"),
   primaryKeys.length > 0 ? `,\n  PRIMARY KEY (${primaryKeys.map((field) => `\`${field.name}\``).join(",")})` : "",
-  uniqueFields
-    .map((field) =>
-      `,\n  UNIQUE KEY \`${tableName.toUpperCase()}_${field.name.toUpperCase()}\` (\`${field.name}\`)`
-    )
-    .join(""),
+  uniqueKeys.length ? uniqueKeys.filter(key => key?.uniqueColumns?.length).map(uk =>
+  `,\n  UNIQUE KEY \`${tableName.toUpperCase()}_${uk.uniqueColumns.join('_').toUpperCase()}\` (${uk.uniqueColumns.map(col => `\`${col}\``).join(',')})`).join("") : "",
   indices
-    .filter((index) => index.currentColumn && index.indexType)
+    .filter((index) => index.columnsToIndex?.length && index.indexType)
     .map((index) => {
-      const referenceId = `${tableName}_${index.currentColumn}`.toUpperCase();
-      return `,\n${index.indexType === 'fulltext' ? "  FULLTEXT" : ""}  INDEX \`${referenceId}\` ${index.indexType === 'hash' ? "USING HASH " : ""}(\`${index.currentColumn}\`)`;
+      const referenceId = `${tableName}_${index.columnsToIndex.join('_')}`.toUpperCase();
+      return `,\n${index.indexType === 'fulltext' ? " FULLTEXT" : ""} INDEX \`${referenceId}\` ${index.indexType === 'hash' ? "USING HASH " : ""}(${index.columnsToIndex.map(col => `\`${col}\``).join(',')})`;
     })
     .join(""),
   foreignKeys

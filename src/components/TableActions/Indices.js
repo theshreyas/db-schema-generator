@@ -1,6 +1,17 @@
 import React from 'react';
+import Select from 'react-select';
 
 const Indices = ({ fields, indices, handleIndexChange, handleRemoveIndex }) => {
+
+  const columnOptions = fields.map((field) => ({
+    value: field.name,
+    label: field.name
+  }));
+  const indexTypeOptions = [
+    { value: 'btree', label: 'btree' },
+    { value: 'fulltext', label: 'fulltext' },
+    { value: 'hash', label: 'hash' }
+  ];
   return (
       <>
         {indices.length > 0 && (
@@ -28,41 +39,36 @@ const Indices = ({ fields, indices, handleIndexChange, handleRemoveIndex }) => {
               </tr>
             </thead>
             <tbody>
-              {indices.map((fk, index) => (
+              {indices.map((row, index) => (
                 <tr
                   key={index}
-                  className={`${fk.isInvalid ? "tr-invalid tr-shake" : ""}`}
+                  className={`${row.isInvalid ? "tr-invalid tr-shake" : ""}`}
                 >
                   <td>
-                    <select
-                      aria-label="Select column"
-                      className="form-control"
-                      name="currentColumn"
-                      value={fk.currentColumn}
-                      onChange={(e) => handleIndexChange(index, e)}
-                    >
-                      <option value="">Select Column</option>
-                      {fields
-                        .filter((field) => field.name)
-                        .map((field, index) => (
-                          <option key={index} value={field.name}>
-                            {field.name}
-                          </option>
-                        ))}
-                    </select>
+                    <Select
+                      value={columnOptions.filter(option => row.columnsToIndex.includes(option.value))}
+                      aria-label="Columns to Index"
+                      isMulti 
+                      name="columnsToIndex"
+                      options={columnOptions}
+                      className="basic-multi-select"
+                      classNamePrefix="select"
+                      onChange={(selectedOptions) => {
+                        const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
+                        handleIndexChange(index, selectedValues);
+                      }}
+                    />
                   </td>
                   <td>
-                    <select
-                      aria-label="Index Type"
-                      className="form-control"
+                    <Select
+                      value={indexTypeOptions.find(option => option.value === row.indexType)}
+                      onChange={(selectedOption) => handleIndexChange(index, selectedOption.value)}
+                      options={indexTypeOptions}
+                      className="basic-single"
+                      classNamePrefix="select"
                       name="indexType"
-                      value={fk.indexType}
-                      onChange={(e) => handleIndexChange(index, e)}
-                    >
-                      <option value="btree">btree</option>
-                      <option value="fulltext">fulltext</option>
-                      <option value="hash">hash</option>
-                    </select>
+                      aria-label="Index Type"
+                    />
                   </td>
                   <td>
                     <button

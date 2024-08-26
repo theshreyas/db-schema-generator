@@ -9,7 +9,7 @@ const getErrorContext = (start, end, query) => {
   return query.slice(start1, end1).replace(/^\S*\s*/, '').replace(/\s*\S*$/, '');
 };
 
-export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKeys, setTableEngine, setTableComment, setFields, setXmlOutput, setQueryError) => {
+export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKeys, setUniqueKeys, setTableEngine, setTableComment, setFields, setXmlOutput, setQueryError) => {
   try {
     parser.parse(mysqlQuery);
   } catch (error) {
@@ -17,7 +17,6 @@ export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKe
     setQueryError(`MySQL Error near '${errorContext}'.`);
     return "";
   }
-
   const createTableQuery = parser.astify(mysqlQuery).find(query => query.keyword === "table" && query.type === "create");
   if (!createTableQuery) {
     setQueryError('Create Table Query not found');
@@ -39,16 +38,23 @@ export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKe
     ...colDefs.filter(col => col.constraint_type?.toLowerCase() === 'primary key').flatMap(item => item.definition.map(def => def.column))
   ];
 
-  const uniqueKeys = colDefs.filter(col => col.constraint_type?.toLowerCase() === 'unique key').flatMap(item => item.definition.map(def => def.column));
-  const indices = colDefs.filter(col => col.index)
-    .flatMap(item => item.definition.map(def => ({
-      currentColumn: def.column,
-      indexType: item.keyword && item.keyword.toLowerCase().includes("fulltext") ? "fulltext" : "btree"
-  })))
-  .filter((value, index, self) =>
-    index === self.findIndex((t) => t.currentColumn === value.currentColumn)
+  const uniqueKeys = colDefs.filter(col => col.constraint_type?.toLowerCase() === 'unique key').flatMap(item => ({
+      uniqueColumns: item.definition.map(i => i.column),
+      index: item.index
+    }));
+  console.log(colDefs);
+  console.log('1uniqueKeys');
+  console.log(uniqueKeys);
+  setUniqueKeys(uniqueKeys);
+  const indices = colDefs
+    .filter(col => col.resource === 'index')
+    .map(item => ({
+      columnsToIndex: item.definition.map(def => def.column),
+      indexType: item.keyword && item.keyword.toLowerCase().includes("fulltext") ? "fulltext" : "btree",
+      index: item.index
+  })).filter((value, index, self) =>
+    index === self.findIndex((t) => t.columnsToIndex === value.columnsToIndex)
   );
-
   setIndices(indices);
 
   const foreignKeys = colDefs.filter(col => col.constraint_type?.toLowerCase() === 'foreign key').map(col => ({
@@ -66,13 +72,12 @@ export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKe
     length: col.definition.length || 255,
     identity: !!col.auto_increment,
     unsigned: col.definition.suffix?.includes('UNSIGNED') || false,
-    nullable: col.nullable?.value !== 'not null',
+    nullable: col.nullable?.value === 'not null',
     primary: primaryKeys.includes(col.column.column),
     defaultValue: col.default_val?.value?.value || col.default_val?.value?.name?.name[0].value || null,
-    unique: uniqueKeys.includes(col.column.column),
     on_update: col.default_val?.value?.over?.type === "on update" || false,
     comment: col.comment?.value?.value || null
   }));
-
+  console.log(fields);
   setFields(fields);
 };

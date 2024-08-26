@@ -170,20 +170,6 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                   </div>
                 </>
               )}
-              {!["text", "blob", "json"].includes(field.type) && (
-                <div className="col-md-3">
-                  <label>Unique</label>
-                  <Form.Check
-                    type="switch"
-                    id={`unique-${index}`}
-                    name="unique"
-                    checked={field.unique || false}
-                    onChange={(event) =>
-                      handleFieldChange(index, event)
-                    }
-                  />
-                </div>
-              )}
               {!["datetime", "timestamp", "text", "blob", "json"].includes(field.type) && !field.identity && (
                 <div className="col-md-3">
                   <label>Default Value</label>

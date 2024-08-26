@@ -10,9 +10,9 @@ export const handleGenerateJSON = (
     return acc;
   }, {});
 
-  const indicesData = indices.reduce((acc, { currentColumn, indexType }) => {
-    if (currentColumn && indexType) {
-      acc[`${tableName}_${currentColumn}`.toUpperCase()] = true;
+  const indicesData = indices.reduce((acc, { columnsToIndex, indexType }) => {
+    if (columnsToIndex.length && indexType) {
+      acc[`${tableName}_${columnsToIndex.join('_')}`.toUpperCase()] = true;
     }
     return acc;
   }, {});
@@ -29,7 +29,7 @@ export const handleGenerateJSON = (
     {}
   );
 
-  if (fields.some((field) => field.name && field.primary)) {
+    if (fields.some((field) => field.name && field.primary)) {
     constraints.PRIMARY = true;
   }
 

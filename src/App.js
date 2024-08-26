@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Header from "./components/Header.js";
+import Header from "./components/Header";
+import About from './components/AboutSection';
+import DataTypes from './components/DataTypesSection';
 import Inputcontainer from "./components/Inputcontainer.js";
 import Outputcontainer from "./components/Outputcontainer.js";
 import QueryBuilder from "./components/QueryBuilder.js";
@@ -10,8 +13,11 @@ import {
   handleIndexChange,
   handleRemoveIndex,
   handleAddForeignKey,
+  handleAddUniqueKey,
   handleForeignKeyChange,
+  handleUniqueKeyChange,
   handleRemoveForeignKey,
+  handleRemoveUniqueKey,
   handleTableData,
   removeTableData,
   handleReset,
@@ -65,6 +71,7 @@ function App() {
   const [tableName, setTableName] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(fields.map(() => false));
   const [foreignKeys, setForeignKeys] = useState([]);
+  const [uniqueKeys, setUniqueKeys] = useState([]);
   const [indices, setIndices] = useState([]);
 
   useEffect(() => {
@@ -75,6 +82,7 @@ function App() {
     fields,
     tableName,
     foreignKeys,
+    uniqueKeys,
     indices,
     migrateTable,
     tableComment,
@@ -92,11 +100,15 @@ function App() {
   ]);
 
   const queryToSchemaXml = () => {
-    queryBuilder && queryToSchema(mysqlQuery, setTableName, setIndices, setForeignKeys,setTableEngine, setTableComment, setFields, setXmlOutput, setQueryError);
+    queryBuilder && queryToSchema(mysqlQuery, setTableName, setIndices, setForeignKeys,setUniqueKeys, setTableEngine, setTableComment, setFields, setXmlOutput, setQueryError);
   };
 
   const onForeignKeyAdd = () => {
     handleAddForeignKey(foreignKeys, setForeignKeys, indices, setIndices);
+  };
+
+  const onUniqueKeyAdd = () => {
+    handleAddUniqueKey(uniqueKeys, setUniqueKeys);
   };
 
   const onIndexAdd = () => {
@@ -132,7 +144,7 @@ function App() {
   };
 
   const generateSQL = () => {
-    !queryBuilder && handleGenerateSQL(fields, tableName, foreignKeys, indices, tableComment, tableEngine, setMysqlOutput);
+    !queryBuilder && handleGenerateSQL(fields, tableName, foreignKeys, uniqueKeys, indices, tableComment, tableEngine, setMysqlOutput);
   };
 
   const onDownloadSQL = () => {
@@ -161,6 +173,7 @@ function App() {
       setFields,
       setShowAdvanced,
       setForeignKeys,
+      setUniqueKeys,
       setIndices
     );
   };
@@ -183,8 +196,8 @@ function App() {
     );
   };
 
-  const onIndexChange = (index, event) => {
-    handleIndexChange(index, event, indices, setIndices);
+  const onIndexChange = (index, selectedValue) => {
+    handleIndexChange(index, selectedValue, indices, setIndices);
   };
 
   const onIndexRemove = (index) => {
@@ -195,8 +208,16 @@ function App() {
     handleForeignKeyChange(index, event, foreignKeys, setForeignKeys, fields);
   };
 
+  const onUniqueKeyChange = (index, selectedValues) => {
+    handleUniqueKeyChange(index, selectedValues, uniqueKeys, setUniqueKeys);
+  };
+
   const onRemoveForeignKey = (index) => {
     handleRemoveForeignKey(index, foreignKeys, setForeignKeys);
+  };
+
+  const onRemoveUniqueKey = (index) => {
+    handleRemoveUniqueKey(index, uniqueKeys, setUniqueKeys);
   };
 
   const generateXml = () => {
@@ -204,6 +225,7 @@ function App() {
       fields,
       tableName,
       foreignKeys,
+      uniqueKeys,
       indices,
       migrateTable,
       tableComment,
@@ -222,77 +244,98 @@ function App() {
   };
 
   return (
-    <div className="container mt-5">
-      <Header queryBuilder={queryBuilder} setQueryBuilder={setQueryBuilder} />
-      {!queryBuilder && (
-        <Inputcontainer 
-          fields={fields}
-          foreignKeys={foreignKeys}
-          handleAddField={onAddField}
-          handleAddForeignKey={onForeignKeyAdd}
-          handleAddIndex={onIndexAdd}
-          handleFieldChange={onFieldChange}
-          handleForeignKeyChange={onForeignKeyChange}
-          handleIndexChange={onIndexChange}
-          handleRemoveField={onRemoveField}
-          handleRemoveForeignKey={onRemoveForeignKey}
-          handleRemoveIndex={onIndexRemove}
-          handleReset={resetAll}
-          handleTableData={onAddTableData}
-          handleToggleAdvanced={onToggleAdvanced}
-          indices={indices}
-          migrateTable={migrateTable}
-          onAddField={onAddField}
-          onAddTableData={onAddTableData}
-          onFieldChange={onFieldChange}
-          onForeignKeyAdd={onForeignKeyAdd}
-          onForeignKeyChange={onForeignKeyChange}
-          onIndexAdd={onIndexAdd}
-          onIndexChange={onIndexChange}
-          onIndexRemove={onIndexRemove}
-          onRemoveField={onRemoveField}
-          onRemoveForeignKey={onRemoveForeignKey}
-          onRemoveTableData={onRemoveTableData}
-          onToggleAdvanced={onToggleAdvanced}
-          removeTableData={onRemoveTableData}
-          resetAll={resetAll}
-          setMigrateTable={setMigrateTable}
-          setTableComment={setTableComment}
-          setTableEngine={setTableEngine}
-          setTableName={setTableName}
-          setTableResource={setTableResource}
-          showAdvanced={showAdvanced}
-          tableComment={tableComment}
-          tableCommentAdded={tableCommentAdded}
-          tableEngine={tableEngine}
-          tableName={tableName}
-          tableResource={tableResource}
-          tableTwiceClick={tableTwiceClick}
+    <Router basename="/db-schema-generator">
+      <Routes>
+        <Route path="/about" element={<About />} />
+        <Route path="/datatypes" element={<DataTypes />} />
+        <Route path="/" element={
+          <div className="container mt-5">
+            <Header queryBuilder={queryBuilder} setQueryBuilder={setQueryBuilder} />
+            {!queryBuilder && (
+              <Inputcontainer 
+                fields={fields}
+                foreignKeys={foreignKeys}
+                uniqueKeys={uniqueKeys}
+                handleAddField={onAddField}
+                handleAddForeignKey={onForeignKeyAdd}
+                handleAddUniqueKey={onUniqueKeyAdd}
+                handleAddIndex={onIndexAdd}
+                handleFieldChange={onFieldChange}
+                handleForeignKeyChange={onForeignKeyChange}
+                handleUniqueKeyChange={onUniqueKeyChange}
+                handleIndexChange={onIndexChange}
+                handleRemoveField={onRemoveField}
+                handleRemoveForeignKey={onRemoveForeignKey}
+                handleRemoveUniqueKey={onRemoveUniqueKey}
+                handleRemoveIndex={onIndexRemove}
+                handleReset={resetAll}
+                handleTableData={onAddTableData}
+                handleToggleAdvanced={onToggleAdvanced}
+                indices={indices}
+                migrateTable={migrateTable}
+                onAddField={onAddField}
+                onAddTableData={onAddTableData}
+                onFieldChange={onFieldChange}
+                onForeignKeyAdd={onForeignKeyAdd}
+                onUniqueKeyAdd={onUniqueKeyAdd}
+                onForeignKeyChange={onForeignKeyChange}
+                onUniqueKeyChange={onUniqueKeyChange}
+                onIndexAdd={onIndexAdd}
+                onIndexChange={onIndexChange}
+                onIndexRemove={onIndexRemove}
+                onRemoveField={onRemoveField}
+                onRemoveForeignKey={onRemoveForeignKey}
+                onRemoveUniqueKey={onRemoveUniqueKey}
+                onRemoveTableData={onRemoveTableData}
+                onToggleAdvanced={onToggleAdvanced}
+                removeTableData={onRemoveTableData}
+                resetAll={resetAll}
+                setMigrateTable={setMigrateTable}
+                setTableComment={setTableComment}
+                setTableEngine={setTableEngine}
+                setTableName={setTableName}
+                setTableResource={setTableResource}
+                showAdvanced={showAdvanced}
+                tableComment={tableComment}
+                tableCommentAdded={tableCommentAdded}
+                tableEngine={tableEngine}
+                tableName={tableName}
+                tableResource={tableResource}
+                tableTwiceClick={tableTwiceClick}
+              />
+            )}
+            {queryBuilder && (
+              <QueryBuilder
+                queryBuilder={queryBuilder}
+                mysqlQuery={mysqlQuery}
+                setMysqlQuery={setMysqlQuery}
+                queryError={queryError}
+              />
+            )}
+            <hr />
+            <Outputcontainer
+              shouldDisplaySchemaOutput={shouldDisplaySchemaOutput()}
+              shouldDisplaySqlOutput={shouldDisplaySqlOutput()}
+              xmlOutput={xmlOutput}
+              mysqlOutput={mysqlOutput}
+              jsonOutput={jsonOutput}
+              handleDownloadXML={onDownloadXML}
+              handleCopyXML={onCopyXML}
+              handleDownloadSQL={onDownloadSQL}
+              handleCopySQL={onCopySQL}
+              handleDownloadJSON={onDownloadJSON}
+              handleCopyJSON={onCopyJSON}
+            />
+          </div>
+          } 
         />
-      )}
-      {queryBuilder && (
-        <QueryBuilder
-          queryBuilder={queryBuilder}
-          mysqlQuery={mysqlQuery}
-          setMysqlQuery={setMysqlQuery}
-          queryError={queryError}
-        />
-      )}
-      <hr />
-      <Outputcontainer
-        shouldDisplaySchemaOutput={shouldDisplaySchemaOutput()}
-        shouldDisplaySqlOutput={shouldDisplaySqlOutput()}
-        xmlOutput={xmlOutput}
-        mysqlOutput={mysqlOutput}
-        jsonOutput={jsonOutput}
-        handleDownloadXML={onDownloadXML}
-        handleCopyXML={onCopyXML}
-        handleDownloadSQL={onDownloadSQL}
-        handleCopySQL={onCopySQL}
-        handleDownloadJSON={onDownloadJSON}
-        handleCopyJSON={onCopyJSON}
-      />
-    </div>
+      </Routes>
+      <div className="footer">
+        <Link to="/">Home</Link>
+        <Link to="/about">About</Link>
+        <Link to="/datatypes">MySQL DataTypes</Link>
+      </div>
+    </Router>
   );
 }
 

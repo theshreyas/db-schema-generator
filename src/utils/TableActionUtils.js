@@ -39,29 +39,32 @@ export const handleAddForeignKey = (foreignKeys, setForeignKeys) => {
   }
 };
 
-export const handleInvalidRow = (
-  index,
-  type,
-  foreignKeys,
-  setForeignKeys,
-  indices,
-  setIndices
-) => {
-  if (type === "foreignKey") {
-    setInvalidRow(index, setForeignKeys, foreignKeys);
+export const handleAddUniqueKey = (uniqueKeys, setUniqueKeys) => {
+  const invalidKeys = uniqueKeys
+    .map((key, idx) => ({ key, idx }))
+    .filter(
+      ({ key }) =>
+        !key.uniqueColumns 
+    );
+  if (invalidKeys.length === 0) {
+    const newUniqueKey = {
+      uniqueColumns: "",
+    };
+    setUniqueKeys([...uniqueKeys, newUniqueKey]);
   } else {
-    setInvalidRow(index, setIndices, indices);
+    invalidKeys.forEach(({ idx }) => {
+      setInvalidRow(idx, setUniqueKeys, uniqueKeys);
+    });
   }
 };
 
 export const handleAddIndex = (indices, setIndices) => {
   const invalidIndices = indices
     .map((index, idx) => ({ index, idx }))
-    .filter(({ index }) => !index.currentColumn);
-
+    .filter(({ index }) => !index.columnsToIndex);
   if (invalidIndices.length === 0) {
     const newIndex = {
-      currentColumn: "",
+      columnsToIndex: "",
       indexType: "btree",
     };
     setIndices([...indices, newIndex]);
@@ -72,14 +75,25 @@ export const handleAddIndex = (indices, setIndices) => {
   }
 };
 
-export const handleIndexChange = (index, event, indices, setIndices) => {
-  const { name, value } = event.target;
+export const handleIndexChange = (index, selectedValue, indices, setIndices) => {
   const newIndices = [...indices];
-  newIndices[index] = {
-    ...newIndices[index],
-    [name]: value,
-  };
+  const name = Array.isArray(selectedValue) ? 'columnsToIndex' : 'indexType';
+  newIndices[index][name] = selectedValue;
   setIndices(newIndices);
+};
+
+export const handleUniqueKeyChange = (
+  index,
+  selectedValues,
+  uniqueKeys,
+  setUniqueKeys
+) => {
+  const newUniqueKeys = [...uniqueKeys];
+  newUniqueKeys[index] = {
+    ...newUniqueKeys[index],
+    uniqueColumns: selectedValues,
+  };
+  setUniqueKeys(newUniqueKeys);
 };
 
 export const handleForeignKeyChange = (
@@ -105,6 +119,12 @@ export const handleRemoveForeignKey = (index, foreignKeys, setForeignKeys) => {
   const newForeignKeys = [...foreignKeys];
   newForeignKeys.splice(index, 1);
   setForeignKeys(newForeignKeys);
+};
+
+export const handleRemoveUniqueKey = (index, uniqueKeys, setUniqueKeys) => {
+  const newUniqueKeys = [...uniqueKeys];
+  newUniqueKeys.splice(index, 1);
+  setUniqueKeys(newUniqueKeys);
 };
 
 export const handleTableData = (
@@ -146,6 +166,7 @@ export const handleReset = (
   setFields,
   setShowAdvanced,
   setForeignKeys,
+  setUniqueKeys,
   setIndices
 ) => {
   setTableName("");
@@ -157,5 +178,6 @@ export const handleReset = (
   setFields([{ name: "", type: "varchar", length: 255, identity: false }]);
   setShowAdvanced([false]);
   setForeignKeys([]);
+  setUniqueKeys([]);
   setIndices([]);
 };

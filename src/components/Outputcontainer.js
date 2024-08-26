@@ -1,4 +1,6 @@
 import React from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const Outputcontainer = ({ shouldDisplaySchemaOutput, shouldDisplaySqlOutput, xmlOutput, mysqlOutput, handleDownloadSQL, handleCopySQL,handleDownloadXML, handleCopyXML, jsonOutput, handleDownloadJSON, handleCopyJSON }) => {
   return (
@@ -8,7 +10,9 @@ const Outputcontainer = ({ shouldDisplaySchemaOutput, shouldDisplaySqlOutput, xm
             <h3>
               <b>db_schema.xml</b>
             </h3>
-            <pre>{xmlOutput}</pre>
+            <SyntaxHighlighter wrapLongLines="true" language="xml" style={dracula}>
+              {xmlOutput}
+            </SyntaxHighlighter>
             <button
               className="btn btn-secondary mr-2"
               onClick={handleDownloadXML}
@@ -26,7 +30,9 @@ const Outputcontainer = ({ shouldDisplaySchemaOutput, shouldDisplaySqlOutput, xm
               <h3>
                 <b>db_schema_whitelist.json</b>
               </h3>
-              <pre>{jsonOutput}</pre>
+              <SyntaxHighlighter language="json" style={dracula}>
+                {jsonOutput}
+              </SyntaxHighlighter>
               <button
                 className="btn btn-secondary mr-2"
                 onClick={handleDownloadJSON}
@@ -44,7 +50,9 @@ const Outputcontainer = ({ shouldDisplaySchemaOutput, shouldDisplaySqlOutput, xm
               <h3>
                 <b>MySQL Query</b>
               </h3>
-              <pre>{mysqlOutput}</pre>
+              <SyntaxHighlighter language="sql" style={dracula}>
+                {mysqlOutput}
+              </SyntaxHighlighter>
               <button
                 className="btn btn-secondary mr-2"
                 onClick={handleDownloadSQL}

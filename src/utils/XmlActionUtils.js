@@ -2,6 +2,7 @@ export const handleGenerateXML = (
   fields,
   tableName,
   foreignKeys,
+  uniqueKeys,
   indices,
   migrateTable,
   tableComment,
@@ -38,48 +39,35 @@ export const handleGenerateXML = (
     return `\t\t<column ${createAttributesString(attributes)} />`;
   };
 
-  const generateConstraintXML = (type, fields, tableName) => {
-    const fieldNames = fields.map((field) => field.name.toUpperCase()).join("_");
-    const referenceId = `${tableName.toUpperCase()}_${fieldNames}`;
-    const fieldXML = fields
-      .map((field) => `\t\t\t<column name="${field.name}"/>`)
+  const generateConstraintXML = (type, referenceId, columns) => {
+    const columnsXML = columns
+      .map((col) => `\t\t\t<column name="${col}"/>`)
       .join("\n");
-
-    return `\t\t<constraint xsi:type="${type}" referenceId="${referenceId}">\n${fieldXML}\n\t\t</constraint>\n`;
+    return `\t\t<constraint xsi:type="${type}" referenceId="${referenceId}">\n${columnsXML}\n\t\t</constraint>\n`;
   };
 
-  const generateForeignKeyXML = (foreignKeys, tableName) =>
-    foreignKeys
-      .filter((key) => key.currentColumn && key.referenceTable && key.referenceColumn)
-      .map((fk) => {
-        const referenceId = `${tableName}_${fk.currentColumn}_${fk.referenceTable}_${fk.referenceColumn}`.toUpperCase();
-        return `\t\t<constraint xsi:type="foreign" referenceId="${referenceId}" table="${tableName}" column="${fk.currentColumn}" referenceTable="${fk.referenceTable}" referenceColumn="${fk.referenceColumn}" onDelete="${fk.onDelete}" />\n`;
-      })
-      .join("");
+  const generateForeignKeyXML = (fk) => {
+    const referenceId = `${tableName}_${fk.currentColumn}_${fk.referenceTable}_${fk.referenceColumn}`.toUpperCase();
+    return `\t\t<constraint xsi:type="foreign" referenceId="${referenceId}" table="${tableName}" column="${fk.currentColumn}" referenceTable="${fk.referenceTable}" referenceColumn="${fk.referenceColumn}" onDelete="${fk.onDelete}" />\n`;
+  };
 
-  const generateIndexXML = (indices, tableName) =>
-    indices
-      .filter((index) => index.currentColumn && index.indexType)
-      .map((index) => {
-        const referenceId = `${tableName}_${index.currentColumn}`.toUpperCase();
-        return `\t\t<index referenceId="${referenceId}" indexType="${index.indexType}">\n\t\t\t<column name="${index.currentColumn}"/>\n\t\t</index>\n`;
-      })
-      .join("");
+  const generateIndexXML = (index) => {
+    console.log('generateIndexXML');
+    console.log(index);
+    const referenceId = index.index || `${tableName}_${index.columnsToIndex.join('_')}`.toUpperCase();
+    console.log('generateIndexXML2');
+    const columnsXML = index.columnsToIndex
+      .map((col) => `\t\t\t<column name="${col}"/>`)
+      .join("\n");
+    return `\t\t<index referenceId="${referenceId}" indexType="${index.indexType}">\n${columnsXML}\n\t\t</index>\n`;
+  };
 
-  const xmlFields = fields.filter((field) => field.name).map(generateFieldXML).join("\n");
-  const primaryFields = fields.filter((field) => field.primary && !["text", "blob", "json"].includes(field.type));
-  const uniqueFields = fields.filter((field) => field.unique);
-
-  const primaryConstraint = primaryFields.length
-    ? generateConstraintXML("primary", primaryFields, "PRIMARY")
-    : "";
-
-  const uniqueConstraint = uniqueFields.length
-    ? generateConstraintXML("unique", uniqueFields, tableName)
-    : "";
-
-  const foreignKeyConstraints = generateForeignKeyXML(foreignKeys, tableName);
-  const indexNodes = generateIndexXML(indices, tableName);
+  const xmlFields = fields.filter(field => field.name).map(generateFieldXML).join("\n");
+  const primaryFields = fields.filter(field => field.primary && !["text", "blob", "json"].includes(field.type));
+  const primaryConstraint = primaryFields.length ? generateConstraintXML("primary", `PRIMARY`, primaryFields.map(f => f.name)) : "";
+  const uniqueConstraint = uniqueKeys.length ? uniqueKeys.filter(key => key?.uniqueColumns?.length).map(uk => generateConstraintXML("unique", uk.index || `${tableName.toUpperCase()}_${uk.uniqueColumns.join('_').toUpperCase()}`, uk.uniqueColumns)).join("") : "";
+  const foreignKeyConstraints = foreignKeys.filter(fk => fk.currentColumn && fk.referenceTable && fk.referenceColumn).map(generateForeignKeyXML).join("");
+  const indexNodes = indices.filter(index => index.columnsToIndex?.length && index.indexType).map(generateIndexXML).join("");
 
   const tableAttributes = createAttributesString([
     migrateTable && `onCreate="migrateDataFromAnotherTable(${migrateTable})"`,
@@ -88,7 +76,7 @@ export const handleGenerateXML = (
     tableEngine && `engine="${tableEngine}"`,
   ]);
 
-  const xmlOutput = `<?xml version="1.0"?>\n<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">\n\t<table name="${tableName}"${tableAttributes ? " " + tableAttributes : ""}>\n${xmlFields}\n${primaryConstraint}${uniqueConstraint}${foreignKeyConstraints}${indexNodes}\t</table>\n</schema>`;
+  const xmlOutput = `<?xml version="1.0"?>\n<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">\n\t<table name="${tableName}"${tableAttributes ? " " + tableAttributes : ""}>\n${xmlFields}\n${primaryConstraint}${foreignKeyConstraints}${uniqueConstraint}${indexNodes}\t</table>\n</schema>`;
 
   setXmlOutput(xmlOutput);
 };
