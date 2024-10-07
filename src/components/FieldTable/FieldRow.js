@@ -22,7 +22,7 @@ const FieldRow = ({field, index, handleFieldChange, handleToggleAdvanced, showAd
           onChange={(event) => handleFieldChange(index, event)}>
           <optgroup label="Int">
             <option value="int">Integer</option>
-            <option value="smallint">Smallint</option>
+            <option value="smallint">Smallint/Boolean</option>
             <option value="bigint">Bigint</option>
           </optgroup>
           <optgroup label="Number">

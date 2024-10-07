@@ -4,6 +4,7 @@ import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Header from "./components/Header";
 import About from './components/AboutSection';
+import Quiz from './components/Quiz';
 import DataTypes from './components/DataTypesSection';
 import Inputcontainer from "./components/Inputcontainer.js";
 import Outputcontainer from "./components/Outputcontainer.js";
@@ -235,18 +236,16 @@ function App() {
     );
   };
 
-  const shouldDisplaySchemaOutput = () =>
-    tableName && fields.some(field => field.name) &&
-    (!queryBuilder || (queryBuilder && mysqlQuery && !queryError));
+  const shouldDisplaySchemaOutput = tableName && fields.some(field => field.name) &&
+    (!queryBuilder || (mysqlQuery && !queryError));
 
-  const shouldDisplaySqlOutput = () => {
-    return shouldDisplaySchemaOutput() && !queryBuilder;
-  };
+  const shouldDisplaySqlOutput = shouldDisplaySchemaOutput && !queryBuilder;
 
   return (
     <Router>
       <Routes>
         <Route path="/about" element={<About />} />
+        <Route path="/quiz" element={<Quiz />} />
         <Route path="/datatypes" element={<DataTypes />} />
         <Route path="/" element={
           <div className="container mt-5">
@@ -314,8 +313,8 @@ function App() {
             )}
             <hr />
             <Outputcontainer
-              shouldDisplaySchemaOutput={shouldDisplaySchemaOutput()}
-              shouldDisplaySqlOutput={shouldDisplaySqlOutput()}
+              shouldDisplaySchemaOutput={shouldDisplaySchemaOutput}
+              shouldDisplaySqlOutput={shouldDisplaySqlOutput}
               xmlOutput={xmlOutput}
               mysqlOutput={mysqlOutput}
               jsonOutput={jsonOutput}
@@ -334,6 +333,7 @@ function App() {
         <Link to="/">Home</Link>
         <Link to="/about">About</Link>
         <Link to="/datatypes">MySQL DataTypes</Link>
+        <Link to="/quiz">Quiz</Link>
       </div>
     </Router>
   );

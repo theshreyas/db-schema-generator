@@ -17,7 +17,13 @@ export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKe
     setQueryError(`MySQL Error near '${errorContext}'.`);
     return "";
   }
-  const createTableQuery = parser.astify(mysqlQuery).find(query => query.keyword === "table" && query.type === "create");
+  const parsedQuery = parser.astify(mysqlQuery);
+  let createTableQuery;
+  if (Array.isArray(parsedQuery)) {
+    createTableQuery = parsedQuery.find(query => query.keyword === "table" && query.type === "create");
+  } else if (parsedQuery.keyword === "table" && parsedQuery.type === "create") {
+    createTableQuery = parsedQuery;
+  }
   if (!createTableQuery) {
     setQueryError('Create Table Query not found');
     return "";

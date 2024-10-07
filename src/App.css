@@ -7,7 +7,6 @@ body {
   border-radius: 16px;
   margin-bottom: 2rem;
 }
-
 .container.mt-5>h1 {
   padding: 15px;
   display: inline-flex;
@@ -42,6 +41,7 @@ table.table {
 
 pre {
   background: #f8f9fa;
+  max-height: 80vh;
   background-color: black;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -124,7 +124,6 @@ div.additional {
   margin-bottom: 2%;
   margin-left: 1%;
   margin-right: 1%;
-  max-height: 100vh;
   overflow-y: auto;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
@@ -262,6 +261,9 @@ table.table.migrate {
     margin-bottom: 2%;
   }
 
+  .querybuilder > button {
+    right: 2% !important;
+  }
   .querybuilder textarea {
     width: 100% !important;
   }
@@ -273,8 +275,18 @@ table.table.migrate {
   align-items: center;
   flex-direction: column;
   margin-top: 1%;
+  position: relative;
+  clear: both;
 }
 
+.querybuilder > button {
+  position: absolute;
+  top: 10px;
+  right: 16%;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
 .querybuilder textarea {
   padding: 10px;
   width: 70%;
@@ -304,7 +316,6 @@ textarea.error:focus,
 textarea.error:focus-visible {
   border: solid 2px red;
 }
-
 .footer {
   text-align: center;
   margin-bottom: 2%;
@@ -313,6 +324,10 @@ textarea.error:focus-visible {
 .footer a {
   color: black;
   margin: 1%;
+}
+/*about css start*/
+.aboutSection {
+  max-width: 1000px !important;
 }
 
 .abHeading {
@@ -324,7 +339,7 @@ textarea.error:focus-visible {
 .about {
   padding: 2%;
   padding-bottom: 1%;
-  width: 58%;
+  width: 95%;
   margin: 0 auto;
 }
 
@@ -367,7 +382,8 @@ textarea.error:focus-visible {
 .planned {
   background-color: #f39c12;
 }
-
+/*about css end*/
+/*datatypes css start*/
 .tg {
   border-collapse: collapse;
   border-color: #9ABAD9;
@@ -510,3 +526,59 @@ textarea.error:focus-visible {
     margin: auto 0px;
   }
 }
+/*datatypes css end*/
+/*quizsection css start*/
+.quizContainer {
+  height: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.welcome-card {
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #126ab9, #f8f9fa);
+  color: #333;
+  width: 50%;
+}
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+.welcome-text {
+  font-size: 1.5rem;
+}
+.complete-card {
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #28a745, #a6f776);
+  color: #fff;
+  width: 40%;
+}
+.complete-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+.score-text {
+  font-size: 2rem;
+}
+.score {
+  font-size: 3rem;
+  font-weight: 900;
+}
+.list-group {
+  margin-top: 2%;
+}
+.list-group-item.active code {
+  color:#ffa8d3;
+}
+@media only screen and (max-width: 600px) {
+  .welcome-card, .complete-card{
+    width: 100%;
+  }
+}
+/*quizsection css end*/
