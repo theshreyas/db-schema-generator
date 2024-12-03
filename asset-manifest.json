@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/db-schema-generator/static/css/main.9f34c059.css",
-    "main.js": "/db-schema-generator/static/js/main.b6ea9a8e.js",
-    "static/js/488.15d71ab3.chunk.js": "/db-schema-generator/static/js/488.15d71ab3.chunk.js",
+    "main.css": "/db-schema-generator/static/css/main.14fb26db.css",
+    "main.js": "/db-schema-generator/static/js/main.b38483a6.js",
+    "static/js/488.434af9bf.chunk.js": "/db-schema-generator/static/js/488.434af9bf.chunk.js",
     "index.html": "/db-schema-generator/index.html",
-    "main.9f34c059.css.map": "/db-schema-generator/static/css/main.9f34c059.css.map",
-    "main.b6ea9a8e.js.map": "/db-schema-generator/static/js/main.b6ea9a8e.js.map",
-    "488.15d71ab3.chunk.js.map": "/db-schema-generator/static/js/488.15d71ab3.chunk.js.map"
+    "main.14fb26db.css.map": "/db-schema-generator/static/css/main.14fb26db.css.map",
+    "main.b38483a6.js.map": "/db-schema-generator/static/js/main.b38483a6.js.map",
+    "488.434af9bf.chunk.js.map": "/db-schema-generator/static/js/488.434af9bf.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.9f34c059.css",
-    "static/js/main.b6ea9a8e.js"
+    "static/css/main.14fb26db.css",
+    "static/js/main.b38483a6.js"
   ]
 }
