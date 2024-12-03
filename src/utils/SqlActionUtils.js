@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 export const handleGenerateSQL = (
   fields,
   tableName,
@@ -68,5 +70,5 @@ export const handleDownloadSQL = (tableName, sqlOutput) => {
 
 export const handleCopySQL = (sqlOutput) => {
   navigator.clipboard.writeText(sqlOutput);
-  alert("Query copied to clipboard!");
+  toast.success("Query copied to clipboard!");
 };

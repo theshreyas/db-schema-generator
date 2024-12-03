@@ -66,6 +66,7 @@ const Inputcontainer = ({ fields, foreignKeys, uniqueKeys, handleAddField, handl
           handleUniqueKeyChange={onUniqueKeyChange}
           handleRemoveUniqueKey={onRemoveUniqueKey}
         />
+        
       </div>
   );
 };

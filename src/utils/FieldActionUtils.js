@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 export const handleAddField = (
   index,
   fields,
@@ -34,40 +36,45 @@ export const handleRemoveField = (
 export const handleFieldChange = (index, event, fields, setFields, foreignKeys) => {
   const { name, type, value, checked } = event.target;
   const newFields = [...fields];
+  const field = newFields[index];
+  const isNumericType = (type) => ["int", "smallint", "bigint", "float", "decimal"].includes(type);
+  const isIntegerType = (type) => ["int", "smallint", "bigint"].includes(type);
+  const isValidDefaultValue = (defaultValue) => defaultValue != null && defaultValue !== "" && !/^[-]?\d*\.?\d+$/.test(defaultValue);
+  
   if (
-    name === "defaultValue" &&
-    ["int", "smallint", "bigint", "float", "decimal"].includes(
-      newFields[index].type
-    )
+    name === "type" &&
+    isNumericType(value) &&
+    isValidDefaultValue(field.defaultValue)
   ) {
+    toast.error("Default value must be numeric for numeric field types.");
+    return;
+  }
+
+  if(name === "defaultValue" && isNumericType(field.type)) {
     if (isNaN(value)) {
-      alert("Default value must be numeric for numeric field types.");
+      toast.error("Default value must be numeric for numeric field types.");
       return;
     }
-    if (["int", "smallint", "bigint"].includes(newFields[index].type)) {
-      if (!Number.isInteger(parseFloat(value))) {
-        alert("Default value must be an integer for integer field types.");
+    if (isIntegerType(field.type) && !Number.isInteger(parseFloat(value))) {
+        toast.error("Default value must be integer for integer field types.");
         return;
-      }
     }
   }
 
-  newFields[index] = {
-    ...newFields[index],
-    [name]: type === "checkbox" ? checked : value,
-  };
-  const field = newFields[index];
+  field[name] = type === "checkbox" ? checked : value;
 
   if (["datetime", "timestamp"].includes(field.type)) {
       field.on_update = !!field.on_update;
   }
   if (name === "nullable") {
     if(field.primary && !checked && !["text", "blob", "json"].includes(field.type)) {
-      return alert('Primary field cannot be set null');
+      toast.error("Primary field cannot be set null");
+      return;
     }
     const nullableKeyExist = foreignKeys.find(key => key.currentColumn === field.name && key.onDelete === "SET NULL");
     if (nullableKeyExist && checked) {
-      return alert('Foreign key is added with on delete not null value!');
+      toast.error("Foreign key is added with on delete not null value!");
+      return;
     }
   }
   if (name === "primary" && checked) {
@@ -75,7 +82,8 @@ export const handleFieldChange = (index, event, fields, setFields, foreignKeys) 
   }
 
   if (name === "identity" && checked && newFields.filter(field => field.identity).length > 1) {
-      return alert("There can only be one auto-increment (identity) column.");
+      toast.error("There can only be one auto-increment (identity) column.");
+      return;
   }
   setFields(newFields);
 };

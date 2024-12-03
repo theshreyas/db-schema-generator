@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { ToastContainer } from 'react-toastify';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import "./App.css";
+import 'react-toastify/dist/ReactToastify.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import Header from "./components/Header";
 import About from './components/AboutSection';
@@ -334,7 +336,9 @@ function App() {
         <Link to="/about">About</Link>
         <Link to="/datatypes">MySQL DataTypes</Link>
         <Link to="/quiz">Quiz</Link>
+        <a href="/system-config-generator">System Config Generator</a>
       </div>
+      <ToastContainer hideProgressBar={true} autoClose={1900} theme="dark" />
     </Router>
   );
 }

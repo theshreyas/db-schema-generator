@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 const setInvalidRow = (index, setState, state) => {
   const updateState = (isInvalid) => {
     const newState = [...state];
@@ -61,7 +63,8 @@ export const handleIndexChange = (index, selectedValue, indices, setIndices, fie
     const field = fields.find(f => f.name === value);
     return field && ["text", "blob", "json"].includes(field.type);
   })) {
-    return alert('Cannot index Text/Blob/Json fields!');
+    toast.error("Cannot index Text/Blob/Json fields!");
+    return;
   }
 
   newIndices[index][name] = selectedValue;
@@ -80,7 +83,8 @@ export const handleForeignKeyChange = (index, event, foreignKeys, setForeignKeys
   newForeignKeys[index][name] = value;
 
   if (value === 'SET NULL' && fields.some(field => newForeignKeys[index].currentColumn === field.name && !field.nullable)) {
-    return alert('Not nullable field cannot be SET NULL!');
+    toast.error("Not nullable field cannot be SET NULL!");
+    return;
   }
 
   setForeignKeys(newForeignKeys);

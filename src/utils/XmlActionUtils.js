@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 export const handleGenerateXML = (
   fields,
   tableName,
@@ -95,5 +97,5 @@ export const handleDownloadXML = (xmlOutput) => {
 
 export const handleCopyXML = (xmlOutput) => {
   navigator.clipboard.writeText(xmlOutput);
-  alert("Schema copied to clipboard!");
+  toast.success("Schema copied to clipboard!");
 };

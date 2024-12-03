@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 export const handleGenerateJSON = (
   fields,
   indices,
@@ -55,5 +57,5 @@ export const handleDownloadJSON = (jsonOutput) => {
 
 export const handleCopyJSON = (jsonOutput) => {
   navigator.clipboard.writeText(jsonOutput);
-  alert("Whitelist JSON copied to clipboard!");
+  toast.success("Whitelist JSON copied to clipboard!");
 };
