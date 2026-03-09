@@ -41,7 +41,7 @@ const Indices = ({ fields, indices, handleIndexChange, handleRemoveIndex }) => {
             <tbody>
               {indices.map((row, index) => (
                 <tr
-                  key={index}
+                  key={`idx-${index}`}
                   className={`${row.isInvalid ? "tr-invalid tr-shake" : ""}`}
                 >
                   <td>
@@ -87,4 +87,4 @@ const Indices = ({ fields, indices, handleIndexChange, handleRemoveIndex }) => {
   );
 };
 
-export default Indices;
+export default React.memo(Indices);

@@ -45,7 +45,7 @@ const FieldRow = ({field, index, handleFieldChange, handleToggleAdvanced, showAd
       <td>
         <div className="d-flex align-items-center">
           <button
-            className="btn btn-primary mr-2"
+            className="btn btn-primary me-2"
             onClick={() => handleToggleAdvanced(index)}
           >
             {showAdvanced[index] ? (
@@ -81,13 +81,13 @@ const FieldRow = ({field, index, handleFieldChange, handleToggleAdvanced, showAd
             )}
           </button>
           <button
-            className="btn btn-success mr-2"
+            className="btn btn-success me-2"
             onClick={() => handleAddField(index)}
           >
             +
           </button>
           <button
-            className="btn btn-danger mr-2"
+            className="btn btn-danger me-2"
             onClick={() => handleRemoveField(index)}
           >
             -
@@ -98,4 +98,4 @@ const FieldRow = ({field, index, handleFieldChange, handleToggleAdvanced, showAd
   );
 };
 
-export default FieldRow;
+export default React.memo(FieldRow);

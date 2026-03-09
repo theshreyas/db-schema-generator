@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { downloadXML, copyXML } from "./downloadUtils";
 
 export const handleGenerateXML = (
   fields,
@@ -22,7 +22,7 @@ export const handleGenerateXML = (
       field.identity && ["int", "smallint", "bigint", "float"].includes(field.type) && `identity="${field.identity}"`,
       field.primary
         ? `nullable="false"`
-        : field.nullable
+        : !field.nullable
         ? `nullable="false"`
         : "",
       !field.identity && field.defaultValue && `default="${field.defaultValue}"`,
@@ -86,16 +86,9 @@ export const handleGenerateXML = (
 };
 
 export const handleDownloadXML = (xmlOutput) => {
-  const blob = new Blob([xmlOutput], { type: "application/xml" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "db_schema.xml";
-  a.click();
-  URL.revokeObjectURL(url);
+  downloadXML(xmlOutput);
 };
 
 export const handleCopyXML = (xmlOutput) => {
-  navigator.clipboard.writeText(xmlOutput);
-  toast.success("Schema copied to clipboard!");
+  copyXML(xmlOutput);
 };

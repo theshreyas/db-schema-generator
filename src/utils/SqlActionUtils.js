@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { downloadSQL, copySQL } from "./downloadUtils";
 
 export const handleGenerateSQL = (
   fields,
@@ -25,7 +25,7 @@ export const handleGenerateSQL = (
             ? `(${field.precision || 10},${field.scale || 0})`
             : "",
           field.unsigned && ["int", "smallint", "bigint", "float"].includes(field.type) && `UNSIGNED`,
-          field.nullable ? "NOT NULL" : "NULL",
+          field.nullable ? "NULL" : "NOT NULL",
           !field.identity && field.defaultValue ? `DEFAULT '${field.defaultValue}'` : "",
           ["datetime", "timestamp"].includes(field.type) && field.defaultTime ? `DEFAULT ${field.defaultTime}` : "",
           field.identity && ["int", "smallint", "bigint", "float"].includes(field.type) && "AUTO_INCREMENT",
@@ -59,16 +59,9 @@ export const handleGenerateSQL = (
 };
 
 export const handleDownloadSQL = (tableName, sqlOutput) => {
-  const blob = new Blob([sqlOutput], { type: "application/xml" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `create_table_${tableName}.sql`;
-  a.click();
-  URL.revokeObjectURL(url);
+  downloadSQL(tableName, sqlOutput);
 };
 
 export const handleCopySQL = (sqlOutput) => {
-  navigator.clipboard.writeText(sqlOutput);
-  toast.success("Query copied to clipboard!");
+  copySQL(sqlOutput);
 };

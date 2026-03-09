@@ -19,7 +19,7 @@ const UniqueKeys = ({ uniqueKeys, handleUniqueKeyChange, fields, handleRemoveUni
           <tbody>
             {uniqueKeys.map((uk, index) => (
               <tr
-                key={index}
+                key={`uk-${index}`}
                 className={`${uk.isInvalid ? "tr-invalid tr-shake" : ""}`}
               >
                 <td>
@@ -53,4 +53,4 @@ const UniqueKeys = ({ uniqueKeys, handleUniqueKeyChange, fields, handleRemoveUni
   );
 };
 
-export default UniqueKeys;
+export default React.memo(UniqueKeys);

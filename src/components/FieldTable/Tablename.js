@@ -15,7 +15,7 @@ const Tablename = ({tableName, setTableName, handleReset}) => {
             onChange={(e) => setTableName(e.target.value)}
           />
         </div>
-        <button className="resetBtn btn btn-primary ml-2" onClick={handleReset}>
+        <button className="resetBtn btn btn-primary ms-2" onClick={handleReset}>
           Reset All
         </button>
     </>

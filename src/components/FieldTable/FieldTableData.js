@@ -15,7 +15,7 @@ const FieldTableData = ({fields, handleFieldChange, handleToggleAdvanced, showAd
       </thead>
       <tbody>
         {fields.map((field, index) => (
-          <React.Fragment key={index}>
+          <React.Fragment key={`field-${index}`}>
             <FieldRow field={field} index={index} handleFieldChange={handleFieldChange} handleToggleAdvanced={handleToggleAdvanced} showAdvanced={showAdvanced} handleAddField={handleAddField} handleRemoveField={handleRemoveField} />
             <AdvancedFieldsRow showAdvanced={showAdvanced} index={index} field={field} handleFieldChange={handleFieldChange} />
           </React.Fragment>

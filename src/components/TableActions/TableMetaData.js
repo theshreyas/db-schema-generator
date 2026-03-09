@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TableMetaData = ({ tableCommentAdded, tableTwiceClick, tableComment, setTableComment, tableEngine, setTableEngine, tableResource, setTableResource, migrateTable, setMigrateTable, removeTableData  }) => {
+const TableMetaData = ({ tableCommentAdded, tableComment, setTableComment, tableEngine, setTableEngine, tableResource, setTableResource, migrateTable, setMigrateTable, removeTableData  }) => {
   return (
       <>
       {tableCommentAdded && (
@@ -58,7 +58,7 @@ const TableMetaData = ({ tableCommentAdded, tableTwiceClick, tableComment, setTa
               </tr>
             </thead>
             <tbody>
-              <tr className={`${tableTwiceClick ? "tr-invalid tr-shake" : ""}`}>
+              <tr>
                 <td>
                   <input
                     type="text"

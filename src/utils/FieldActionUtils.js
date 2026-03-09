@@ -1,4 +1,10 @@
 import { toast } from "react-toastify";
+import {
+  NUMERIC_TYPES,
+  INTEGER_TYPES,
+  DATETIME_TYPES,
+  NON_INDEXABLE_TYPES,
+} from "../constants/fieldConstants";
 
 export const handleAddField = (
   index,
@@ -37,9 +43,9 @@ export const handleFieldChange = (index, event, fields, setFields, foreignKeys) 
   const { name, type, value, checked } = event.target;
   const newFields = [...fields];
   const field = newFields[index];
-  const isNumericType = (type) => ["int", "smallint", "bigint", "float", "decimal"].includes(type);
-  const isIntegerType = (type) => ["int", "smallint", "bigint"].includes(type);
-  const isValidDefaultValue = (defaultValue) => defaultValue != null && defaultValue !== "" && !/^[-]?\d*\.?\d+$/.test(defaultValue);
+  const isNumericType = (type) => NUMERIC_TYPES.includes(type);
+  const isIntegerType = (type) => INTEGER_TYPES.includes(type);
+  const isValidDefaultValue = (defaultValue) => defaultValue != null && defaultValue !== "" && /^[-]?\d*\.?\d+$/.test(defaultValue);
   
   if (
     name === "type" &&
@@ -63,11 +69,11 @@ export const handleFieldChange = (index, event, fields, setFields, foreignKeys) 
 
   field[name] = type === "checkbox" ? checked : value;
 
-  if (["datetime", "timestamp"].includes(field.type)) {
+  if (DATETIME_TYPES.includes(field.type)) {
       field.on_update = !!field.on_update;
   }
   if (name === "nullable") {
-    if(field.primary && !checked && !["text", "blob", "json"].includes(field.type)) {
+    if(field.primary && !checked && !NON_INDEXABLE_TYPES.includes(field.type)) {
       toast.error("Primary field cannot be set null");
       return;
     }
@@ -81,7 +87,7 @@ export const handleFieldChange = (index, event, fields, setFields, foreignKeys) 
       field.nullable = true;
   }
 
-  if (name === "identity" && checked && newFields.filter(field => field.identity).length > 1) {
+  if (name === "identity" && checked && newFields.filter(f => f.identity).length > 1) {
       toast.error("There can only be one auto-increment (identity) column.");
       return;
   }

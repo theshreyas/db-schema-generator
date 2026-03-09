@@ -1,4 +1,10 @@
 import { toast } from "react-toastify";
+import {
+  DEFAULT_FOREIGN_KEY,
+  DEFAULT_UNIQUE_KEY,
+  DEFAULT_INDEX,
+  DEFAULT_FIELD_VALUE,
+} from "../constants/fieldConstants";
 
 const setInvalidRow = (index, setState, state) => {
   const updateState = (isInvalid) => {
@@ -27,12 +33,7 @@ export const handleAddForeignKey = (foreignKeys, setForeignKeys) => {
   handleAddKey(
     foreignKeys,
     setForeignKeys,
-    {
-      currentColumn: "",
-      referenceTable: "",
-      referenceColumn: "",
-      onDelete: "CASCADE",
-    },
+    DEFAULT_FOREIGN_KEY,
     (key) => !key.currentColumn || !key.referenceTable || !key.referenceColumn
   );
 };
@@ -41,7 +42,7 @@ export const handleAddUniqueKey = (uniqueKeys, setUniqueKeys) => {
   handleAddKey(
     uniqueKeys,
     setUniqueKeys,
-    { uniqueColumns: "" },
+    DEFAULT_UNIQUE_KEY,
     (key) => !key.uniqueColumns
   );
 };
@@ -50,7 +51,7 @@ export const handleAddIndex = (indices, setIndices) => {
   handleAddKey(
     indices,
     setIndices,
-    { columnsToIndex: "", indexType: "btree" },
+    DEFAULT_INDEX,
     (index) => !index.columnsToIndex
   );
 };
@@ -108,11 +109,8 @@ export const handleRemoveIndex = (index, indices, setIndices) => {
   handleRemoveItem(index, indices, setIndices);
 };
 
-export const handleTableData = (tableCommentAdded, setTableTwiceClick, setTableCommentAdded) => {
-  if (tableCommentAdded) {
-    setTableTwiceClick(true);
-    setTimeout(() => setTableTwiceClick(false), 1000);
-  } else {
+export const handleTableData = (tableCommentAdded, setTableCommentAdded) => {
+  if (!tableCommentAdded) {
     setTableCommentAdded(true);
   }
 };
@@ -132,7 +130,7 @@ export const handleReset = (setTableName, setTableCommentAdded, setMigrateTable,
   setTableEngine("");
   setTableComment("");
   setTableResource("");
-  setFields([{ name: "", type: "varchar", length: 255, identity: false }]);
+  setFields([DEFAULT_FIELD_VALUE]);
   setShowAdvanced([false]);
   setForeignKeys([]);
   setUniqueKeys([]);

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
 import { ToastContainer } from 'react-toastify';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import "./App.css";
 import 'react-toastify/dist/ReactToastify.css';
 import "bootstrap/dist/css/bootstrap.min.css";
+import { debounce } from "./utils/debounceUtils";
+import ErrorBoundary from "./components/ErrorBoundary";
+import Loading from "./components/Loading";
 import Header from "./components/Header";
-import About from './components/AboutSection';
-import Quiz from './components/Quiz';
-import DataTypes from './components/DataTypesSection';
 import Inputcontainer from "./components/Inputcontainer.js";
 import Outputcontainer from "./components/Outputcontainer.js";
-import QueryBuilder from "./components/QueryBuilder.js";
 import {
   handleAddIndex,
   handleIndexChange,
@@ -25,35 +24,36 @@ import {
   removeTableData,
   handleReset,
 } from "./utils/TableActionUtils";
-
 import {
   queryToSchema
 } from "./utils/QueryToSchemaActionUtils";
-
 import {
   handleAddField,
   handleRemoveField,
   handleFieldChange,
   handleToggleAdvanced,
 } from "./utils/FieldActionUtils";
-
 import {
   handleGenerateSQL,
   handleDownloadSQL,
   handleCopySQL
 } from "./utils/SqlActionUtils";
-
 import {
   handleGenerateXML,
   handleDownloadXML,
   handleCopyXML
 } from "./utils/XmlActionUtils";
-
 import {
   handleGenerateJSON,
   handleDownloadJSON,
   handleCopyJSON,
 } from "./utils/JsonActionUtils";
+
+// Lazy load route components for code splitting
+const About = lazy(() => import('./components/AboutSection'));
+const Quiz = lazy(() => import('./components/Quiz'));
+const DataTypes = lazy(() => import('./components/DataTypesSection'));
+const QueryBuilder = lazy(() => import('./components/QueryBuilder.js'));
 
 function App() {
   const [fields, setFields] = useState([
@@ -69,7 +69,6 @@ function App() {
   const [jsonOutput, setJsonOutput] = useState("");
   const [migrateTable, setMigrateTable] = useState("");
   const [tableComment, setTableComment] = useState("");
-  const [tableTwiceClick, setTableTwiceClick] = useState(false);
   const [tableCommentAdded, setTableCommentAdded] = useState(false);
   const [tableName, setTableName] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(fields.map(() => false));
@@ -77,95 +76,123 @@ function App() {
   const [uniqueKeys, setUniqueKeys] = useState([]);
   const [indices, setIndices] = useState([]);
 
+  const generateJson = useCallback(() => {
+    handleGenerateJSON(fields, indices, tableName, foreignKeys, setJsonOutput);
+  }, [fields, indices, tableName, foreignKeys]);
+
+  const generateSQL = useCallback(() => {
+    !queryBuilder && handleGenerateSQL(fields, tableName, foreignKeys, uniqueKeys, indices, tableComment, tableEngine, setMysqlOutput);
+  }, [fields, tableName, foreignKeys, uniqueKeys, indices, tableComment, tableEngine, queryBuilder]);
+
+  const generateXml = useCallback(() => {
+    handleGenerateXML(
+      fields,
+      tableName,
+      foreignKeys,
+      uniqueKeys,
+      indices,
+      migrateTable,
+      tableComment,
+      tableResource,
+      tableEngine,
+      setXmlOutput
+    );
+  }, [fields, tableName, foreignKeys, uniqueKeys, indices, migrateTable, tableComment, tableResource, tableEngine]);
+
+  // Create debounced versions of output generators (300ms delay)
+  const debouncedGenerateXml = useMemo(() => debounce(generateXml, 300), [generateXml]);
+  const debouncedGenerateJson = useMemo(() => debounce(generateJson, 300), [generateJson]);
+  const debouncedGenerateSQL = useMemo(() => debounce(generateSQL, 300), [generateSQL]);
+
   useEffect(() => {
-    generateXml();
-    generateJson();
-    generateSQL();
-  }, [
-    fields,
-    tableName,
-    foreignKeys,
-    uniqueKeys,
-    indices,
-    migrateTable,
-    tableComment,
-    tableResource,
-    tableEngine,
-    mysqlQuery,
-    queryBuilder
-  ]);
+    debouncedGenerateXml();
+    debouncedGenerateJson();
+    debouncedGenerateSQL();
+  }, [debouncedGenerateXml, debouncedGenerateJson, debouncedGenerateSQL]);
+
+  const queryToSchemaXml = useCallback(() => {
+    queryBuilder && queryToSchema(mysqlQuery, setTableName, setIndices, setForeignKeys, setUniqueKeys, setTableEngine, setTableComment, setFields, setXmlOutput, setQueryError);
+  }, [mysqlQuery, queryBuilder]);
 
   useEffect(() => {
     queryToSchemaXml();
-  }, [
-    mysqlQuery,
-    tableName
-  ]);
+  }, [queryToSchemaXml]);
 
-  const queryToSchemaXml = () => {
-    queryBuilder && queryToSchema(mysqlQuery, setTableName, setIndices, setForeignKeys,setUniqueKeys, setTableEngine, setTableComment, setFields, setXmlOutput, setQueryError);
-  };
-
-  const onForeignKeyAdd = () => {
-    handleAddForeignKey(foreignKeys, setForeignKeys, indices, setIndices);
-  };
-
-  const onUniqueKeyAdd = () => {
-    handleAddUniqueKey(uniqueKeys, setUniqueKeys);
-  };
-
-  const onIndexAdd = () => {
-    handleAddIndex(indices, setIndices, foreignKeys, setForeignKeys);
-  };
-
-  const onAddField = (index) => {
+  // Field handlers
+  const onAddField = useCallback((index) => {
     handleAddField(index, fields, setFields, setShowAdvanced, showAdvanced);
-  };
+  }, [fields, showAdvanced]);
 
-  const onRemoveField = (index) => {
+  const onRemoveField = useCallback((index) => {
     handleRemoveField(index, fields, setFields, showAdvanced, setShowAdvanced);
-  };
+  }, [fields, showAdvanced]);
 
-  const onFieldChange = (index, event) => {
+  const onFieldChange = useCallback((index, event) => {
     handleFieldChange(index, event, fields, setFields, foreignKeys);
-  };
+  }, [fields, foreignKeys]);
 
-  const onToggleAdvanced = (index) => {
+  const onToggleAdvanced = useCallback((index) => {
     handleToggleAdvanced(index, showAdvanced, setShowAdvanced);
-  };
+  }, [showAdvanced]);
 
-  const onDownloadXML = () => {
-    handleDownloadXML(xmlOutput);
-  };
+  // Foreign key handlers
+  const onForeignKeyAdd = useCallback(() => {
+    handleAddForeignKey(foreignKeys, setForeignKeys, indices, setIndices);
+  }, [foreignKeys, indices]);
 
-  const onCopyXML = () => {
-    handleCopyXML(xmlOutput);
-  };
+  const onForeignKeyChange = useCallback((index, event) => {
+    handleForeignKeyChange(index, event, foreignKeys, setForeignKeys, fields);
+  }, [foreignKeys, fields]);
 
-  const generateJson = () => {
-    handleGenerateJSON(fields, indices, tableName, foreignKeys, setJsonOutput);
-  };
+  const onRemoveForeignKey = useCallback((index) => {
+    handleRemoveForeignKey(index, foreignKeys, setForeignKeys);
+  }, [foreignKeys]);
 
-  const generateSQL = () => {
-    !queryBuilder && handleGenerateSQL(fields, tableName, foreignKeys, uniqueKeys, indices, tableComment, tableEngine, setMysqlOutput);
-  };
+  // Unique key handlers
+  const onUniqueKeyAdd = useCallback(() => {
+    handleAddUniqueKey(uniqueKeys, setUniqueKeys);
+  }, [uniqueKeys]);
 
-  const onDownloadSQL = () => {
-    handleDownloadSQL(tableName, mysqlOutput);
-  };
+  const onUniqueKeyChange = useCallback((index, selectedValues) => {
+    handleUniqueKeyChange(index, selectedValues, uniqueKeys, setUniqueKeys);
+  }, [uniqueKeys]);
 
-  const onCopySQL = () => {
-    handleCopySQL(mysqlOutput);
-  };
-  const onDownloadJSON = () => {
-    handleDownloadJSON(jsonOutput);
-  };
+  const onRemoveUniqueKey = useCallback((index) => {
+    handleRemoveUniqueKey(index, uniqueKeys, setUniqueKeys);
+  }, [uniqueKeys]);
 
-  const onCopyJSON = () => {
-    handleCopyJSON(jsonOutput);
-  };
+  // Index handlers
+  const onIndexAdd = useCallback(() => {
+    handleAddIndex(indices, setIndices, foreignKeys, setForeignKeys);
+  }, [indices, foreignKeys]);
 
-  const resetAll = () => {
+  const onIndexChange = useCallback((index, selectedValue) => {
+    handleIndexChange(index, selectedValue, indices, setIndices, fields);
+  }, [indices, fields]);
+
+  const onIndexRemove = useCallback((index) => {
+    handleRemoveIndex(index, indices, setIndices);
+  }, [indices]);
+
+  // Table data handlers
+  const onAddTableData = useCallback(() => {
+    handleTableData(
+      tableCommentAdded,
+      setTableCommentAdded
+    );
+  }, [tableCommentAdded]);
+
+  const onRemoveTableData = useCallback(() => {
+    removeTableData(
+      setTableCommentAdded,
+      setTableEngine,
+      setMigrateTable,
+      setTableComment,
+      setTableResource
+    );
+  }, []);
+
+  const resetAll = useCallback(() => {
     handleReset(
       setTableName,
       setTableCommentAdded,
@@ -179,131 +206,98 @@ function App() {
       setUniqueKeys,
       setIndices
     );
-  };
+  }, []);
 
-  const onAddTableData = () => {
-    handleTableData(
-      tableCommentAdded,
-      setTableTwiceClick,
-      setTableCommentAdded
-    );
-  };
+  // Output handlers
+  const onDownloadXML = useCallback(() => {
+    handleDownloadXML(xmlOutput);
+  }, [xmlOutput]);
 
-  const onRemoveTableData = () => {
-    removeTableData(
-      setTableCommentAdded,
-      setTableEngine,
-      setMigrateTable,
-      setTableComment,
-      setTableResource
-    );
-  };
+  const onCopyXML = useCallback(() => {
+    handleCopyXML(xmlOutput);
+  }, [xmlOutput]);
 
-  const onIndexChange = (index, selectedValue) => {
-    handleIndexChange(index, selectedValue, indices, setIndices, fields);
-  };
+  const onDownloadSQL = useCallback(() => {
+    handleDownloadSQL(tableName, mysqlOutput);
+  }, [tableName, mysqlOutput]);
 
-  const onIndexRemove = (index) => {
-    handleRemoveIndex(index, indices, setIndices);
-  };
+  const onCopySQL = useCallback(() => {
+    handleCopySQL(mysqlOutput);
+  }, [mysqlOutput]);
 
-  const onForeignKeyChange = (index, event) => {
-    handleForeignKeyChange(index, event, foreignKeys, setForeignKeys, fields);
-  };
+  const onDownloadJSON = useCallback(() => {
+    handleDownloadJSON(jsonOutput);
+  }, [jsonOutput]);
 
-  const onUniqueKeyChange = (index, selectedValues) => {
-    handleUniqueKeyChange(index, selectedValues, uniqueKeys, setUniqueKeys);
-  };
+  const onCopyJSON = useCallback(() => {
+    handleCopyJSON(jsonOutput);
+  }, [jsonOutput]);
 
-  const onRemoveForeignKey = (index) => {
-    handleRemoveForeignKey(index, foreignKeys, setForeignKeys);
-  };
+  // Memoize handler collections to prevent prop drilling inefficiencies
+  const inputContainerProps = useMemo(() => ({
+    fields,
+    tableName,
+    tableComment,
+    tableCommentAdded,
+    tableEngine,
+    tableResource,
+    migrateTable,
+    showAdvanced,
+    foreignKeys,
+    uniqueKeys,
+    indices,
+    setTableName,
+    setTableComment,
+    setTableEngine,
+    setTableResource,
+    setMigrateTable,
+    onAddField,
+    onRemoveField,
+    onFieldChange,
+    onToggleAdvanced,
+    onAddForeignKey: onForeignKeyAdd,
+    onForeignKeyChange,
+    onRemoveForeignKey,
+    onAddUniqueKey: onUniqueKeyAdd,
+    onUniqueKeyChange,
+    onRemoveUniqueKey,
+    onAddIndex: onIndexAdd,
+    onIndexChange,
+    onIndexRemove,
+    onAddTableData,
+    onRemoveTableData,
+    onReset: resetAll,
+  }), [fields, tableName, tableComment, tableCommentAdded, tableEngine, tableResource, 
+      migrateTable, showAdvanced, foreignKeys, uniqueKeys, indices, setTableName, 
+      setTableComment, setTableEngine, setTableResource, setMigrateTable, onAddField, 
+      onRemoveField, onFieldChange, onToggleAdvanced, onForeignKeyAdd, onForeignKeyChange, 
+      onRemoveForeignKey, onUniqueKeyAdd, onUniqueKeyChange, onRemoveUniqueKey, onIndexAdd, 
+      onIndexChange, onIndexRemove, onAddTableData, onRemoveTableData, resetAll]);
 
-  const onRemoveUniqueKey = (index) => {
-    handleRemoveUniqueKey(index, uniqueKeys, setUniqueKeys);
-  };
+  const shouldDisplaySchemaOutput = useMemo(
+    () => tableName && fields.some(field => field.name) &&
+      (!queryBuilder || (mysqlQuery && !queryError)),
+    [tableName, fields, queryBuilder, mysqlQuery, queryError]
+  );
 
-  const generateXml = () => {
-    handleGenerateXML(
-      fields,
-      tableName,
-      foreignKeys,
-      uniqueKeys,
-      indices,
-      migrateTable,
-      tableComment,
-      tableResource,
-      tableEngine,
-      setXmlOutput
-    );
-  };
-
-  const shouldDisplaySchemaOutput = tableName && fields.some(field => field.name) &&
-    (!queryBuilder || (mysqlQuery && !queryError));
-
-  const shouldDisplaySqlOutput = shouldDisplaySchemaOutput && !queryBuilder;
+  const shouldDisplaySqlOutput = useMemo(
+    () => shouldDisplaySchemaOutput && !queryBuilder,
+    [shouldDisplaySchemaOutput, queryBuilder]
+  );
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/about" element={<About />} />
-        <Route path="/quiz" element={<Quiz />} />
-        <Route path="/datatypes" element={<DataTypes />} />
-        <Route path="/" element={
+    <ErrorBoundary>
+      <Router>
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            <Route path="/about" element={<About />} />
+            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/datatypes" element={<DataTypes />} />
+            <Route path="/" element={
           <div className="container mt-5">
             <Header queryBuilder={queryBuilder} setQueryBuilder={setQueryBuilder} />
             {!queryBuilder && (
-              <Inputcontainer 
-                fields={fields}
-                foreignKeys={foreignKeys}
-                uniqueKeys={uniqueKeys}
-                handleAddField={onAddField}
-                handleAddForeignKey={onForeignKeyAdd}
-                handleAddUniqueKey={onUniqueKeyAdd}
-                handleAddIndex={onIndexAdd}
-                handleFieldChange={onFieldChange}
-                handleForeignKeyChange={onForeignKeyChange}
-                handleUniqueKeyChange={onUniqueKeyChange}
-                handleIndexChange={onIndexChange}
-                handleRemoveField={onRemoveField}
-                handleRemoveForeignKey={onRemoveForeignKey}
-                handleRemoveUniqueKey={onRemoveUniqueKey}
-                handleRemoveIndex={onIndexRemove}
-                handleReset={resetAll}
-                handleTableData={onAddTableData}
-                handleToggleAdvanced={onToggleAdvanced}
-                indices={indices}
-                migrateTable={migrateTable}
-                onAddField={onAddField}
-                onAddTableData={onAddTableData}
-                onFieldChange={onFieldChange}
-                onForeignKeyAdd={onForeignKeyAdd}
-                onUniqueKeyAdd={onUniqueKeyAdd}
-                onForeignKeyChange={onForeignKeyChange}
-                onUniqueKeyChange={onUniqueKeyChange}
-                onIndexAdd={onIndexAdd}
-                onIndexChange={onIndexChange}
-                onIndexRemove={onIndexRemove}
-                onRemoveField={onRemoveField}
-                onRemoveForeignKey={onRemoveForeignKey}
-                onRemoveUniqueKey={onRemoveUniqueKey}
-                onRemoveTableData={onRemoveTableData}
-                onToggleAdvanced={onToggleAdvanced}
-                removeTableData={onRemoveTableData}
-                resetAll={resetAll}
-                setMigrateTable={setMigrateTable}
-                setTableComment={setTableComment}
-                setTableEngine={setTableEngine}
-                setTableName={setTableName}
-                setTableResource={setTableResource}
-                showAdvanced={showAdvanced}
-                tableComment={tableComment}
-                tableCommentAdded={tableCommentAdded}
-                tableEngine={tableEngine}
-                tableName={tableName}
-                tableResource={tableResource}
-                tableTwiceClick={tableTwiceClick}
-              />
+              <Inputcontainer {...inputContainerProps} />
             )}
             {queryBuilder && (
               <QueryBuilder
@@ -331,15 +325,17 @@ function App() {
           } 
         />
       </Routes>
-      <div className="footer">
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/datatypes">MySQL DataTypes</Link>
-        <Link to="/quiz">Quiz</Link>
-        <a href="/system-config-generator">System Config Generator</a>
-      </div>
-      <ToastContainer hideProgressBar={true} autoClose={1900} theme="dark" />
-    </Router>
+        </Suspense>
+        <div className="footer">
+          <Link to="/">Home</Link>
+          <Link to="/about">About</Link>
+          <Link to="/datatypes">MySQL DataTypes</Link>
+          <Link to="/quiz">Quiz</Link>
+          <a href="/system-config-generator">System Config Generator</a>
+        </div>
+        <ToastContainer hideProgressBar={true} autoClose={1900} theme="dark" />
+      </Router>
+    </ErrorBoundary>
   );
 }
 

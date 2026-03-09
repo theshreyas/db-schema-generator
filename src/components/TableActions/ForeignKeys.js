@@ -31,7 +31,7 @@ const ForeignKeys = ({ foreignKeys, handleForeignKeyChange, fields, handleRemove
           <tbody>
             {foreignKeys.map((fk, index) => (
               <tr
-                key={index}
+                key={`fk-${index}`}
                 className={`${fk.isInvalid ? "tr-invalid tr-shake" : ""}`}
               >
                 <td>
@@ -45,8 +45,8 @@ const ForeignKeys = ({ foreignKeys, handleForeignKeyChange, fields, handleRemove
                     <option value="">Select Column</option>
                     {fields
                       .filter((field) => field.name)
-                      .map((field, index) => (
-                        <option key={index} value={field.name}>
+                      .map((field, fieldIndex) => (
+                        <option key={fieldIndex} value={field.name}>
                           {field.name}
                         </option>
                       ))}
@@ -100,4 +100,4 @@ const ForeignKeys = ({ foreignKeys, handleForeignKeyChange, fields, handleRemove
   );
 };
 
-export default ForeignKeys;
+export default React.memo(ForeignKeys);

@@ -112,8 +112,8 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
                 <label>
                   Not Null (
                   {field.nullable || false
-                    ? "nullable : false"
-                    : "nullable : true"}
+                    ? "nullable : true"
+                    : "nullable : false"}
                   )
                 </label>
                 <Form.Check
@@ -204,4 +204,4 @@ const AdvancedFieldsRow = ({ showAdvanced, index, field, handleFieldChange}) => 
   );
 };
 
-export default AdvancedFieldsRow;
+export default React.memo(AdvancedFieldsRow);

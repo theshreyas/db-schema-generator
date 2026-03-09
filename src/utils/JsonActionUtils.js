@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { downloadJSON, copyJSON } from "./downloadUtils";
 
 export const handleGenerateJSON = (
   fields,
@@ -46,16 +46,9 @@ export const handleGenerateJSON = (
 };
 
 export const handleDownloadJSON = (jsonOutput) => {
-  const blob = new Blob([jsonOutput], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "db_schema_whitelist.json";
-  a.click();
-  URL.revokeObjectURL(url);
+  downloadJSON(jsonOutput);
 };
 
 export const handleCopyJSON = (jsonOutput) => {
-  navigator.clipboard.writeText(jsonOutput);
-  toast.success("Whitelist JSON copied to clipboard!");
+  copyJSON(jsonOutput);
 };

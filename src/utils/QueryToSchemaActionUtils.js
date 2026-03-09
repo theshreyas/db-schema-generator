@@ -75,7 +75,7 @@ export const queryToSchema = (mysqlQuery, setTableName, setIndices, setForeignKe
     length: col.definition.length || 255,
     identity: !!col.auto_increment,
     unsigned: col.definition.suffix?.includes('UNSIGNED') || false,
-    nullable: col.nullable?.value === 'not null',
+    nullable: col.nullable?.value !== 'not null',
     primary: primaryKeys.includes(col.column.column),
     defaultValue: col.default_val?.value?.value || col.default_val?.value?.name?.name[0].value || null,
     on_update: col.default_val?.value?.over?.type === "on update" || false,
