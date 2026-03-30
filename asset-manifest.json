@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.css": "/db-schema-generator/static/css/main.7fd7db7d.css",
-    "main.js": "/db-schema-generator/static/js/main.acc77b15.js",
+    "main.css": "/db-schema-generator/static/css/main.8d89355e.css",
+    "main.js": "/db-schema-generator/static/js/main.aaff448b.js",
     "static/js/269.8b076d7d.chunk.js": "/db-schema-generator/static/js/269.8b076d7d.chunk.js",
     "static/js/624.1ceff809.chunk.js": "/db-schema-generator/static/js/624.1ceff809.chunk.js",
     "static/js/661.e7e186a7.chunk.js": "/db-schema-generator/static/js/661.e7e186a7.chunk.js",
-    "static/js/565.ce608fe1.chunk.js": "/db-schema-generator/static/js/565.ce608fe1.chunk.js",
+    "static/js/565.ce00fd8d.chunk.js": "/db-schema-generator/static/js/565.ce00fd8d.chunk.js",
     "static/js/488.6330ca6d.chunk.js": "/db-schema-generator/static/js/488.6330ca6d.chunk.js",
     "static/js/999.1a1f9202.chunk.js": "/db-schema-generator/static/js/999.1a1f9202.chunk.js",
     "static/js/575.82ae9a27.chunk.js": "/db-schema-generator/static/js/575.82ae9a27.chunk.js",
@@ -13,14 +13,14 @@
     "static/js/775.7cd87c12.chunk.js": "/db-schema-generator/static/js/775.7cd87c12.chunk.js",
     "static/css/696.1409f4db.chunk.css": "/db-schema-generator/static/css/696.1409f4db.chunk.css",
     "static/js/696.b6d5f08b.chunk.js": "/db-schema-generator/static/js/696.b6d5f08b.chunk.js",
-    "static/js/489.65053d63.chunk.js": "/db-schema-generator/static/js/489.65053d63.chunk.js",
+    "static/js/489.82fcf63e.chunk.js": "/db-schema-generator/static/js/489.82fcf63e.chunk.js",
     "index.html": "/db-schema-generator/index.html",
-    "main.7fd7db7d.css.map": "/db-schema-generator/static/css/main.7fd7db7d.css.map",
-    "main.acc77b15.js.map": "/db-schema-generator/static/js/main.acc77b15.js.map",
+    "main.8d89355e.css.map": "/db-schema-generator/static/css/main.8d89355e.css.map",
+    "main.aaff448b.js.map": "/db-schema-generator/static/js/main.aaff448b.js.map",
     "269.8b076d7d.chunk.js.map": "/db-schema-generator/static/js/269.8b076d7d.chunk.js.map",
     "624.1ceff809.chunk.js.map": "/db-schema-generator/static/js/624.1ceff809.chunk.js.map",
     "661.e7e186a7.chunk.js.map": "/db-schema-generator/static/js/661.e7e186a7.chunk.js.map",
-    "565.ce608fe1.chunk.js.map": "/db-schema-generator/static/js/565.ce608fe1.chunk.js.map",
+    "565.ce00fd8d.chunk.js.map": "/db-schema-generator/static/js/565.ce00fd8d.chunk.js.map",
     "488.6330ca6d.chunk.js.map": "/db-schema-generator/static/js/488.6330ca6d.chunk.js.map",
     "999.1a1f9202.chunk.js.map": "/db-schema-generator/static/js/999.1a1f9202.chunk.js.map",
     "575.82ae9a27.chunk.js.map": "/db-schema-generator/static/js/575.82ae9a27.chunk.js.map",
@@ -28,10 +28,10 @@
     "775.7cd87c12.chunk.js.map": "/db-schema-generator/static/js/775.7cd87c12.chunk.js.map",
     "696.1409f4db.chunk.css.map": "/db-schema-generator/static/css/696.1409f4db.chunk.css.map",
     "696.b6d5f08b.chunk.js.map": "/db-schema-generator/static/js/696.b6d5f08b.chunk.js.map",
-    "489.65053d63.chunk.js.map": "/db-schema-generator/static/js/489.65053d63.chunk.js.map"
+    "489.82fcf63e.chunk.js.map": "/db-schema-generator/static/js/489.82fcf63e.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.7fd7db7d.css",
-    "static/js/main.acc77b15.js"
+    "static/css/main.8d89355e.css",
+    "static/js/main.aaff448b.js"
   ]
 }
